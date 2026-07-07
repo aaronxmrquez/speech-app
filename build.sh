@@ -86,6 +86,45 @@ codesign --force --sign "$IDENTITY" "$APP"
 
 echo "✓ Bundle listo: $APP (firma: $IDENTITY)"
 
+# Genera un DMG distribuible: ./build.sh release dmg
+if [ "${2:-}" = "dmg" ]; then
+  VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Support/Info.plist)"
+  STAGE="$(mktemp -d)"
+  ditto "$APP" "$STAGE/Dicta.app"
+  ln -s /Applications "$STAGE/Aplicaciones"
+  cat > "$STAGE/LÉEME.txt" <<'EOF'
+DICTA — dictado por voz para macOS
+==================================
+
+Requisitos: Mac con Apple Silicon (M1 o superior) y macOS 14 o más nuevo.
+
+Instalación
+1. Arrastra Dicta.app a la carpeta "Aplicaciones" (el acceso directo está
+   en esta misma ventana).
+2. Abre Dicta desde Aplicaciones. Si macOS dice que no puede verificar la
+   app: Ajustes del Sistema → Privacidad y seguridad → baja hasta ver
+   "Se bloqueó Dicta…" → "Abrir de todos modos". Es una sola vez.
+3. Dicta te pedirá tres permisos (Micrófono, Reconocimiento de voz y
+   Accesibilidad) — la propia app te guía paso a paso.
+4. Al final se abren los Ajustes: presiona "Descargar" para el modelo de
+   voz Whisper (574 MB, una sola vez). Si prefieres no descargarlo,
+   cambia el motor a "Apple".
+
+Uso
+Haz clic en cualquier campo de texto, mantén presionada la tecla
+⌘ derecha (cambiable a fn o ⌥ derecha en Ajustes), habla, y al soltarla
+el texto se escribe solo. Esc cancela. En Idioma puedes poner "Auto"
+para hablar español o inglés indistintamente.
+
+Privacidad: todo el procesamiento de voz ocurre en tu Mac. Nada sale a
+internet.
+EOF
+  hdiutil create -volname "Dicta" -srcfolder "$STAGE" -ov -format UDZO \
+    "build/Dicta-$VERSION.dmg" > /dev/null
+  rm -rf "$STAGE"
+  echo "✓ DMG listo: build/Dicta-$VERSION.dmg"
+fi
+
 if [ "${2:-}" = "install" ]; then
   pkill -x Dicta 2>/dev/null || true
   sleep 0.5

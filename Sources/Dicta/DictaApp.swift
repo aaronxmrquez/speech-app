@@ -71,6 +71,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onboardingWindow = OnboardingWindowController(permissions: permissions, prefs: prefs) { [weak self] in
                 // reintenta el event tap ahora que Accesibilidad puede estar concedida
                 self?.appState.start()
+                // Instalación nueva: si el motor Whisper no tiene modelo aún,
+                // abrir Ajustes para que la descarga quede a un clic.
+                if self?.prefs.engine == .whisper && ModelManager.shared.modelReady == false {
+                    self?.showSettings()
+                }
             }
         }
         onboardingWindow?.show()
