@@ -11,7 +11,17 @@ negro/blanco.
   inserta el texto. **Esc** cancela. Presionar cualquier otra tecla mientras
   mantienes también cancela (los atajos como ⌘C siguen funcionando).
 - **Alternar**: ⌥ Espacio inicia y detiene (elegible en Ajustes).
-- Idiomas: Español / English, cambiables desde el menú de la barra.
+- Idiomas: Auto (detección) / Español / English, cambiables desde el menú.
+
+## Motores (v2)
+
+- **Whisper (por defecto)**: whisper.cpp con Metal, modelo large-v3-turbo
+  cuantizado (~574 MB, se descarga desde Ajustes la primera vez). Máxima
+  precisión en español e inglés (incluso con acento) y detección automática
+  de idioma. 100 % local. Híbrido: mientras hablas ves parciales en vivo del
+  motor de Apple y al soltar se inserta el resultado de Whisper (~1 s).
+  Mantiene el modelo en RAM (~800 MB) mientras la app corre.
+- **Apple**: SFSpeechRecognizer. Más liviano, parciales en vivo, sin descargas.
 
 Necesita tres permisos (el onboarding los guía): Micrófono, Reconocimiento de
 voz y Accesibilidad.

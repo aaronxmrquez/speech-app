@@ -24,7 +24,7 @@ final class AppState: ObservableObject {
     let permissions: Permissions
 
     private let recorder = AudioRecorder()
-    private let engine: TranscriptionEngine = AppleSpeechEngine()
+    private var engine: TranscriptionEngine = AppleSpeechEngine()
     private let inserter = TextInserter()
     private let hotkey = HotkeyMonitor()
 
@@ -96,6 +96,19 @@ final class AppState: ObservableObject {
         case .rightOption: hotkey.holdKey = .rightOption
         case .fn: hotkey.holdKey = .fn
         }
+        syncEngine()
+    }
+
+    /// Cambia la instancia del motor si la preferencia cambió. Nunca durante
+    /// un dictado: beginDictation lo llama justo antes de empezar.
+    private func syncEngine() {
+        guard canBegin else { return }
+        switch prefs.engine {
+        case .apple:
+            if !(engine is AppleSpeechEngine) { engine = AppleSpeechEngine() }
+        case .whisper:
+            if !(engine is WhisperEngine) { engine = WhisperEngine(modelURL: ModelManager.modelURL) }
+        }
     }
 
     // MARK: activación
@@ -147,6 +160,7 @@ final class AppState: ObservableObject {
         dismissTask?.cancel()
         partialText = ""
         audioLevel = 0
+        syncEngine()
 
         do {
             try engine.begin(localeId: prefs.languageId) { [weak self] text in

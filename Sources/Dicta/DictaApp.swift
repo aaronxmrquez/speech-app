@@ -27,6 +27,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        // Modo debug: transcribir un archivo con Whisper e imprimir el resultado.
+        if let flagIndex = CommandLine.arguments.firstIndex(of: "--transcribe-file"),
+           CommandLine.arguments.count > flagIndex + 1 {
+            let path = CommandLine.arguments[flagIndex + 1]
+            let language = CommandLine.arguments.count > flagIndex + 2
+                ? CommandLine.arguments[flagIndex + 2] : "auto"
+            Task { @MainActor in
+                let text = await DebugTranscriber.transcribe(path: path, language: language)
+                print("TRANSCRIPT[\(language)]: \(text)")
+                exit(0)
+            }
+            return
+        }
+
         NSApp.setActivationPolicy(.accessory)
         permissions.refresh()
 

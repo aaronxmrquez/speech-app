@@ -2,9 +2,12 @@
 # Compila Dicta y ensambla el bundle build/Dicta.app
 # Uso: ./build.sh [debug|release] [install]
 #
-# Nota: compila con swiftc directamente (los Command Line Tools de esta máquina
-# tienen un SwiftPM roto por una actualización parcial). El SDK 15.5 se pasa
-# explícito porque el compilador Swift 6.1.2 no soporta el SDK 26.2 instalado.
+# Notas de esta máquina:
+# - Compila con swiftc directamente (el SwiftPM de los Command Line Tools está
+#   roto por una actualización parcial) y con el SDK 15.5 explícito (el
+#   compilador Swift 6.1.2 no soporta el SDK 26.2 instalado).
+# - whisper.cpp se clona y compila en vendor/ la primera vez (estático + Metal;
+#   GGML_METAL_EMBED_LIBRARY evita depender del compilador de Metal de Xcode).
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -14,6 +17,28 @@ APP="build/Dicta.app"
 SDK="/Library/Developer/CommandLineTools/SDKs/MacOSX15.5.sdk"
 if [ ! -d "$SDK" ]; then
   SDK="$(xcrun --sdk macosx --show-sdk-path)"
+fi
+
+CMAKE="$(command -v cmake || echo /opt/homebrew/bin/cmake)"
+VENDOR="vendor/whisper.cpp"
+WBUILD="$VENDOR/build-static"
+
+if [ ! -f "$WBUILD/src/libwhisper.a" ]; then
+  echo "→ Compilando whisper.cpp (primera vez)…"
+  if [ ! -d "$VENDOR" ]; then
+    git clone --depth 1 --branch v1.7.4 https://github.com/ggerganov/whisper.cpp "$VENDOR"
+  fi
+  "$CMAKE" -S "$VENDOR" -B "$WBUILD" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DGGML_METAL=ON \
+    -DGGML_METAL_EMBED_LIBRARY=ON \
+    -DWHISPER_BUILD_EXAMPLES=OFF \
+    -DWHISPER_BUILD_TESTS=OFF \
+    -DWHISPER_BUILD_SERVER=OFF \
+    -DCMAKE_OSX_SYSROOT="$SDK" \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 > /dev/null
+  "$CMAKE" --build "$WBUILD" -j "$(sysctl -n hw.ncpu)"
 fi
 
 OPT="-O"
@@ -27,6 +52,18 @@ swiftc $OPT \
   -target arm64-apple-macosx14.0 \
   -swift-version 5 \
   -parse-as-library \
+  -I Support/CWhisper \
+  -I "$VENDOR/include" \
+  -I "$VENDOR/ggml/include" \
+  -L "$WBUILD/src" \
+  -L "$WBUILD/ggml/src" \
+  -L "$WBUILD/ggml/src/ggml-metal" \
+  -L "$WBUILD/ggml/src/ggml-blas" \
+  -lwhisper -lggml -lggml-base -lggml-cpu -lggml-metal -lggml-blas \
+  -lc++ \
+  -framework Metal \
+  -framework Foundation \
+  -framework Accelerate \
   -o build/Dicta-bin \
   $(find Sources -name '*.swift')
 

@@ -14,7 +14,9 @@ final class AppleSpeechEngine: TranscriptionEngine {
     func begin(localeId: String, onPartial: @escaping (String) -> Void) throws {
         cancel()
 
-        guard let recognizer = SFSpeechRecognizer(locale: Locale(identifier: localeId)),
+        // Este motor no autodetecta idioma: "auto" cae a español.
+        let effectiveLocale = localeId == "auto" ? "es-MX" : localeId
+        guard let recognizer = SFSpeechRecognizer(locale: Locale(identifier: effectiveLocale)),
               recognizer.isAvailable else {
             throw NSError(domain: "Dicta", code: 2,
                           userInfo: [NSLocalizedDescriptionKey: "Reconocimiento de voz no disponible"])
