@@ -13,7 +13,7 @@ final class SettingsWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 596),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 638),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -129,6 +129,12 @@ struct SettingsView: View {
                         .labelsHidden()
                         .toggleStyle(.switch)
                 }
+                divider
+                row("Guardar historial") {
+                    Toggle("", isOn: $prefs.saveHistory)
+                        .labelsHidden()
+                        .toggleStyle(.switch)
+                }
             }
 
             if let launchAtLoginError {
@@ -139,12 +145,12 @@ struct SettingsView: View {
 
             Spacer()
 
-            Text("Dicta 2.0 — habla y el texto se escribe donde esté tu cursor.")
+            Text("Dicta \(Self.appVersion) — habla y el texto se escribe donde esté tu cursor.")
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.tertiary)
         }
         .padding(28)
-        .frame(width: 400, height: 596, alignment: .topLeading)
+        .frame(width: 400, height: 638, alignment: .topLeading)
         .background(Theme.background)
         .tint(Color.white.opacity(0.35))
         .preferredColorScheme(.dark)
@@ -192,6 +198,10 @@ struct SettingsView: View {
         if models.isDownloading { return "Descargando… \(Int(models.progress * 100)) %" }
         if let error = models.errorMessage { return error }
         return "\(ModelManager.modelSizeMB) MB · se descarga una sola vez"
+    }
+
+    private static var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
     }
 
     private func setLaunchAtLogin(_ enabled: Bool) {

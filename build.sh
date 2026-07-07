@@ -75,21 +75,30 @@ if [ -f Support/AppIcon.icns ]; then
   cp Support/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 fi
 
-# Firma ad-hoc: suficiente para uso local. Al recompilar, macOS puede pedir
-# re-conceder el permiso de Accesibilidad (la identidad de código cambia).
-codesign --force --sign - "$APP"
+# Firmar con el certificado local estable si existe (los permisos TCC
+# sobreviven las recompilaciones); si no, ad-hoc. Crear el certificado con
+# Support/make_signing_cert.sh (una sola vez).
+IDENTITY="-"
+if security find-identity -v -p codesigning 2>/dev/null | grep -q "Dicta Local Signing"; then
+  IDENTITY="Dicta Local Signing"
+fi
+codesign --force --sign "$IDENTITY" "$APP"
 
-echo "✓ Bundle listo: $APP"
+echo "✓ Bundle listo: $APP (firma: $IDENTITY)"
 
 if [ "${2:-}" = "install" ]; then
   pkill -x Dicta 2>/dev/null || true
   sleep 0.5
   rm -rf /Applications/Dicta.app
   ditto "$APP" /Applications/Dicta.app
-  # La firma ad-hoc cambia en cada build y deja obsoleto el permiso de
-  # Accesibilidad (el switch se ve encendido pero no aplica). Resetearlo
-  # para que el sistema lo pida de nuevo de forma honesta.
-  tccutil reset Accessibility com.aaronmarquez.dicta >/dev/null 2>&1 || true
-  echo "✓ Instalado en /Applications/Dicta.app"
-  echo "  (recuerda re-conceder Accesibilidad si macOS lo pide)"
+  if [ "$IDENTITY" = "-" ]; then
+    # La firma ad-hoc cambia en cada build y deja obsoleto el permiso de
+    # Accesibilidad (el switch se ve encendido pero no aplica). Resetearlo
+    # para que el sistema lo pida de nuevo de forma honesta.
+    tccutil reset Accessibility com.aaronmarquez.dicta >/dev/null 2>&1 || true
+    echo "✓ Instalado en /Applications/Dicta.app"
+    echo "  (firma ad-hoc: re-concede Accesibilidad si macOS lo pide)"
+  else
+    echo "✓ Instalado en /Applications/Dicta.app (identidad estable)"
+  fi
 fi

@@ -14,12 +14,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private(set) var prefs = Preferences()
     private(set) var permissions = Permissions()
-    private(set) lazy var appState = AppState(prefs: prefs, permissions: permissions)
+    private(set) var history = HistoryStore()
+    private(set) lazy var appState = AppState(prefs: prefs, permissions: permissions, history: history)
 
     private var menuBar: MenuBarController?
     private var hud: HUDController?
     private var settingsWindow: SettingsWindowController?
     private var onboardingWindow: OnboardingWindowController?
+    private var historyWindow: HistoryWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if PreviewRenderer.runIfRequested(prefs: prefs, permissions: permissions) {
@@ -79,6 +81,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             settingsWindow = SettingsWindowController(prefs: prefs)
         }
         settingsWindow?.show()
+    }
+
+    func showHistory() {
+        if historyWindow == nil {
+            historyWindow = HistoryWindowController(history: appState.history)
+        }
+        historyWindow?.show()
     }
 
     /// Relanza la app (útil cuando macOS no aplica un permiso recién concedido

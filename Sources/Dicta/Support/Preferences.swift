@@ -65,6 +65,9 @@ final class Preferences: ObservableObject {
     @Published var playSounds: Bool {
         didSet { defaults.set(playSounds, forKey: "playSounds") }
     }
+    @Published var saveHistory: Bool {
+        didSet { defaults.set(saveHistory, forKey: "saveHistory") }
+    }
     @Published var hasCompletedOnboarding: Bool {
         didSet { defaults.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding") }
     }
@@ -77,6 +80,7 @@ final class Preferences: ObservableObject {
         languageId = defaults.string(forKey: "languageId") ?? "es-MX"
         engine = EngineKind(rawValue: defaults.string(forKey: "engine") ?? "") ?? .whisper
         playSounds = defaults.object(forKey: "playSounds") == nil ? true : defaults.bool(forKey: "playSounds")
+        saveHistory = defaults.object(forKey: "saveHistory") == nil ? true : defaults.bool(forKey: "saveHistory")
         hasCompletedOnboarding = defaults.bool(forKey: "hasCompletedOnboarding")
     }
 }

@@ -18,7 +18,7 @@ enum PreviewRenderer {
                size: CGSize(width: 440, height: 560),
                to: dir.appendingPathComponent("onboarding.png"))
 
-        let state = AppState(prefs: prefs, permissions: permissions)
+        let state = AppState(prefs: prefs, permissions: permissions, history: HistoryStore.preview())
         state.applyPreview(phase: .recording,
                            partialText: "hola, esto es una prueba del dictado por voz",
                            audioLevel: 0.7)
@@ -26,7 +26,7 @@ enum PreviewRenderer {
                size: CGSize(width: 480, height: 130),
                to: dir.appendingPathComponent("hud-recording.png"))
 
-        let doneState = AppState(prefs: prefs, permissions: permissions)
+        let doneState = AppState(prefs: prefs, permissions: permissions, history: HistoryStore.preview())
         doneState.applyPreview(phase: .done, partialText: "", audioLevel: 0)
         render(HUDView(state: doneState, prefs: prefs),
                size: CGSize(width: 480, height: 130),
@@ -35,8 +35,12 @@ enum PreviewRenderer {
         // Ajustes usa controles AppKit (pickers, switches) que ImageRenderer no
         // sabe dibujar: renderizar la ventana real con cacheDisplay.
         renderInWindow(SettingsView(prefs: prefs),
-                       size: CGSize(width: 400, height: 596),
+                       size: CGSize(width: 400, height: 638),
                        to: dir.appendingPathComponent("settings.png"))
+
+        renderInWindow(HistoryView(history: HistoryStore.preview()),
+                       size: CGSize(width: 400, height: 500),
+                       to: dir.appendingPathComponent("history.png"))
 
         return true
     }

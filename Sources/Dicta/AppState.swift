@@ -22,6 +22,7 @@ final class AppState: ObservableObject {
 
     let prefs: Preferences
     let permissions: Permissions
+    let history: HistoryStore
 
     private let recorder = AudioRecorder()
     private var engine: TranscriptionEngine = AppleSpeechEngine()
@@ -33,9 +34,10 @@ final class AppState: ObservableObject {
     private var healTimer: Timer?
     private var cancellables = Set<AnyCancellable>()
 
-    init(prefs: Preferences, permissions: Permissions) {
+    init(prefs: Preferences, permissions: Permissions, history: HistoryStore) {
         self.prefs = prefs
         self.permissions = permissions
+        self.history = history
 
         hotkey.onHoldBegan = { [weak self] in
             Task { @MainActor in self?.holdBegan() }
@@ -213,9 +215,13 @@ final class AppState: ObservableObject {
     private func insert(_ text: String) {
         phase = .inserting
         partialText = text
+        let targetApp = NSWorkspace.shared.frontmostApplication?.localizedName
         inserter.insert(text) { [weak self] in
             guard let self else { return }
             self.playSound("Pop")
+            if self.prefs.saveHistory {
+                self.history.add(text: text, appName: targetApp)
+            }
             self.phase = .done
             self.scheduleDismiss(after: 0.7) { $0 == .done }
         }

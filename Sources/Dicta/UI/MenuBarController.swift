@@ -81,6 +81,10 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         languageRoot.submenu = languageMenu
         menu.addItem(languageRoot)
 
+        let historyItem = NSMenuItem(title: "Historial…", action: #selector(openHistory), keyEquivalent: "")
+        historyItem.target = self
+        menu.addItem(historyItem)
+
         let settings = NSMenuItem(title: "Ajustes…", action: #selector(openSettings), keyEquivalent: ",")
         settings.target = self
         menu.addItem(settings)
@@ -114,6 +118,7 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
     @objc private func openSettings() { appDelegate?.showSettings() }
     @objc private func openOnboarding() { appDelegate?.showOnboarding() }
+    @objc private func openHistory() { appDelegate?.showHistory() }
     @objc private func relaunchApp() { appDelegate?.relaunch() }
 
     @objc private func grantAccessibility() {

@@ -23,6 +23,21 @@ negro/blanco.
   Mantiene el modelo en RAM (~800 MB) mientras la app corre.
 - **Apple**: SFSpeechRecognizer. Más liviano, parciales en vivo, sin descargas.
 
+## Historial (v3)
+
+Menú → **Historial…**: los últimos 100 dictados (texto, fecha y app destino),
+guardados localmente en `~/Library/Application Support/Dicta/history.json`.
+Clic en uno para copiarlo. Se desactiva en Ajustes → "Guardar historial".
+
+## Firma estable (v3)
+
+`Support/make_signing_cert.sh` crea un certificado local autofirmado
+("Dicta Local Signing", solo para firma de código) y `build.sh` lo usa
+automáticamente si existe: la identidad de la app deja de cambiar entre
+builds y el permiso de Accesibilidad se concede una sola vez. Sin el
+certificado, `build.sh` cae a firma ad-hoc (y resetea Accesibilidad al
+instalar para evitar el "switch fantasma").
+
 Necesita tres permisos (el onboarding los guía): Micrófono, Reconocimiento de
 voz y Accesibilidad.
 
