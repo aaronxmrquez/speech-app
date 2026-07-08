@@ -117,6 +117,25 @@ for entry in entries {
 try! drawIcon(pixels: 512).representation(using: .png, properties: [:])!
     .write(to: previewURL)
 
+// Variantes blancas-sobre-transparente del logo para usar dentro de la app:
+// icono de barra de menús (36 px de ancho, @2x de ~18 pt) y logo del onboarding.
+func writeWhiteLogo(width: Int, to url: URL) {
+    let height = Int(CGFloat(width) / logoAspect)
+    let context = CGContext(data: nil, width: width, height: height,
+                            bitsPerComponent: 8, bytesPerRow: width * 4,
+                            space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    context.interpolationQuality = .high
+    context.draw(whiteLogo, in: CGRect(x: 0, y: 0, width: width, height: height))
+    let image = context.makeImage()!
+    let rep = NSBitmapImageRep(cgImage: image)
+    try! rep.representation(using: .png, properties: [:])!.write(to: url)
+}
+
+let supportURL = URL(fileURLWithPath: projectDir).appendingPathComponent("Support")
+writeWhiteLogo(width: 36, to: supportURL.appendingPathComponent("MenuBarIcon.png"))
+writeWhiteLogo(width: 256, to: supportURL.appendingPathComponent("LogoWhite.png"))
+
 let iconutil = Process()
 iconutil.executableURL = URL(fileURLWithPath: "/usr/bin/iconutil")
 iconutil.arguments = ["-c", "icns", iconsetURL.path, "-o", icnsURL.path]

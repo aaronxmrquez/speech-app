@@ -28,20 +28,46 @@ final class MenuBarController: NSObject, NSMenuDelegate {
     }
 
     private func updateIcon() {
-        let name: String
-        if !state.hotkeyActive {
-            name = "mic.slash" // el detector de teclado no está escuchando
-        } else {
-            switch state.phase {
-            case .recording, .transcribing, .inserting: name = "waveform"
-            default: name = "mic"
-            }
+        // Mientras se dicta/procesa: waveform como feedback de actividad.
+        // En reposo: el logo de Dicta (atenuado si el hotkey no está escuchando).
+        let isWorking: Bool
+        switch state.phase {
+        case .recording, .transcribing, .inserting: isWorking = true
+        default: isWorking = false
         }
-        let config = NSImage.SymbolConfiguration(pointSize: 13.5, weight: .medium)
-        let image = NSImage(systemSymbolName: name, accessibilityDescription: "Dicta")?
-            .withSymbolConfiguration(config)
-        image?.isTemplate = true
-        statusItem.button?.image = image
+
+        if isWorking {
+            let config = NSImage.SymbolConfiguration(pointSize: 13.5, weight: .medium)
+            let image = NSImage(systemSymbolName: "waveform", accessibilityDescription: "Dicta")?
+                .withSymbolConfiguration(config)
+            image?.isTemplate = true
+            statusItem.button?.image = image
+        } else {
+            statusItem.button?.image = Self.logoIcon(dimmed: !state.hotkeyActive)
+        }
+    }
+
+    /// Logo de la app como template de barra de menús; atenuado = hotkey inactivo.
+    private static func logoIcon(dimmed: Bool) -> NSImage? {
+        guard let url = Bundle.main.url(forResource: "MenuBarIcon", withExtension: "png"),
+              let source = NSImage(contentsOf: url) else {
+            // fallback si el asset no está en el bundle
+            let config = NSImage.SymbolConfiguration(pointSize: 13.5, weight: .medium)
+            let image = NSImage(systemSymbolName: dimmed ? "mic.slash" : "mic",
+                                accessibilityDescription: "Dicta")?
+                .withSymbolConfiguration(config)
+            image?.isTemplate = true
+            return image
+        }
+        let aspect = source.size.height / source.size.width
+        let size = NSSize(width: 16.5, height: (16.5 * aspect).rounded())
+        let image = NSImage(size: size, flipped: false) { rect in
+            source.draw(in: rect, from: .zero, operation: .sourceOver,
+                        fraction: dimmed ? 0.35 : 1.0)
+            return true
+        }
+        image.isTemplate = true
+        return image
     }
 
     // Reconstruye el menú en cada apertura: los checkmarks siempre reflejan el estado.

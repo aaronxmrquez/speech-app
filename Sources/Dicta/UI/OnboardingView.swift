@@ -66,9 +66,17 @@ struct OnboardingView: View {
                         .fill(Theme.card)
                         .frame(width: 64, height: 64)
                         .overlay(Circle().strokeBorder(Theme.border, lineWidth: 1))
-                    Image(systemName: "waveform")
-                        .font(.system(size: 26, weight: .medium))
-                        .foregroundStyle(Theme.primary)
+                    if let logoURL = Bundle.main.url(forResource: "LogoWhite", withExtension: "png"),
+                       let logo = NSImage(contentsOf: logoURL) {
+                        Image(nsImage: logo)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 34)
+                    } else {
+                        Image(systemName: "waveform")
+                            .font(.system(size: 26, weight: .medium))
+                            .foregroundStyle(Theme.primary)
+                    }
                 }
                 Text("Dicta")
                     .font(.system(size: 26, weight: .semibold))

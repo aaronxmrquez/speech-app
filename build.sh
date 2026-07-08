@@ -74,6 +74,9 @@ cp Support/Info.plist "$APP/Contents/Info.plist"
 if [ -f Support/AppIcon.icns ]; then
   cp Support/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 fi
+for asset in MenuBarIcon.png LogoWhite.png; do
+  [ -f "Support/$asset" ] && cp "Support/$asset" "$APP/Contents/Resources/$asset"
+done
 
 # Firmar con el certificado local estable si existe (los permisos TCC
 # sobreviven las recompilaciones); si no, ad-hoc. Crear el certificado con
