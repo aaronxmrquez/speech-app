@@ -87,8 +87,9 @@ codesign --force --sign "$IDENTITY" "$APP"
 echo "✓ Bundle listo: $APP (firma: $IDENTITY)"
 
 # Genera un DMG distribuible: ./build.sh release dmg
+# El nombre es fijo (Dicta.dmg) para que el link de descarga
+# releases/latest/download/Dicta.dmg sea estable entre versiones.
 if [ "${2:-}" = "dmg" ]; then
-  VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Support/Info.plist)"
   STAGE="$(mktemp -d)"
   ditto "$APP" "$STAGE/Dicta.app"
   ln -s /Applications "$STAGE/Aplicaciones"
@@ -120,9 +121,9 @@ Privacidad: todo el procesamiento de voz ocurre en tu Mac. Nada sale a
 internet.
 EOF
   hdiutil create -volname "Dicta" -srcfolder "$STAGE" -ov -format UDZO \
-    "build/Dicta-$VERSION.dmg" > /dev/null
+    "build/Dicta.dmg" > /dev/null
   rm -rf "$STAGE"
-  echo "✓ DMG listo: build/Dicta-$VERSION.dmg"
+  echo "✓ DMG listo: build/Dicta.dmg"
 fi
 
 if [ "${2:-}" = "install" ]; then
