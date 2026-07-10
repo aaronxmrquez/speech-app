@@ -22,8 +22,9 @@ struct HUDView: View {
         .padding(.horizontal, 18)
         .frame(width: 410, height: 58)
         .background(
+            // Fondo carbón del branding (antes negro puro).
             RoundedRectangle(cornerRadius: 29, style: .continuous)
-                .fill(Color.black.opacity(0.92))
+                .fill(Theme.background.opacity(0.97))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 29, style: .continuous)
@@ -35,12 +36,15 @@ struct HUDView: View {
 
     private var languageBadge: some View {
         Text(prefs.language.short)
-            .font(.system(size: 10, weight: .semibold))
-            .tracking(1)
+            .font(Theme.mono(10, .medium))
+            .tracking(1.5)
             .foregroundStyle(Theme.secondary)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .overlay(Capsule().strokeBorder(Theme.border, lineWidth: 1))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .strokeBorder(Theme.border, lineWidth: 1)
+            )
     }
 
     @ViewBuilder
@@ -68,28 +72,39 @@ struct HUDView: View {
     private var content: some View {
         switch state.phase {
         case .recording:
-            Text(state.partialText.isEmpty ? "Listening…" : state.partialText)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(state.partialText.isEmpty ? Theme.tertiary : Theme.primary)
-                .lineLimit(1)
-                .truncationMode(.head) // se ve el final de la frase, lo recién dictado
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if state.partialText.isEmpty {
+                statusLabel("LISTENING…", style: Theme.tertiary)
+            } else {
+                // El texto vivo del dictado en Inter: frases largas legibles.
+                Text(state.partialText)
+                    .font(Theme.sans(13))
+                    .foregroundStyle(Theme.primary)
+                    .lineLimit(1)
+                    .truncationMode(.head) // se ve el final de la frase, lo recién dictado
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         case .transcribing:
-            statusText("Transcribing…", style: Theme.secondary)
+            statusLabel("TRANSCRIBING…", style: Theme.secondary)
         case .inserting:
-            statusText("Typing…", style: Theme.secondary)
+            statusLabel("TYPING…", style: Theme.secondary)
         case .done:
-            statusText("Done", style: Theme.primary)
+            statusLabel("DONE", style: Theme.primary)
         case .notice(let message):
-            statusText(message, style: Theme.secondary)
+            Text(message)
+                .font(Theme.sans(12.5))
+                .foregroundStyle(Theme.secondary)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
         case .idle:
             EmptyView()
         }
     }
 
-    private func statusText(_ text: String, style: Color) -> some View {
+    /// Etiquetas de estado en Space Mono, como los labels del branding.
+    private func statusLabel(_ text: String, style: Color) -> some View {
         Text(text)
-            .font(.system(size: 13, weight: .medium))
+            .font(Theme.mono(12, .medium))
+            .tracking(1.8)
             .foregroundStyle(style)
             .lineLimit(1)
             .frame(maxWidth: .infinity, alignment: .leading)

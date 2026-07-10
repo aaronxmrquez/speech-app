@@ -28,7 +28,16 @@ enum Theme {
         return .custom(name, size: size)
     }
 
+    private static let interAvailable = NSFont(name: "Inter-Regular", size: 12) != nil
+
     static func sans(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {
-        .system(size: size, weight: weight)
+        guard interAvailable else {
+            return .system(size: size, weight: weight)
+        }
+        let boldWeights: Set<Font.Weight> = [.medium, .semibold, .bold, .heavy, .black]
+        let name = boldWeights.contains(weight) ? "Inter-Medium" : "Inter-Regular"
+        // Si la instancia Medium no existe en la fuente variable, cae a Regular.
+        let resolved = NSFont(name: name, size: 12) != nil ? name : "Inter-Regular"
+        return .custom(resolved, size: size)
     }
 }
