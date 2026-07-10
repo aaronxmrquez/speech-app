@@ -19,7 +19,7 @@ final class AppleSpeechEngine: TranscriptionEngine {
         guard let recognizer = SFSpeechRecognizer(locale: Locale(identifier: effectiveLocale)),
               recognizer.isAvailable else {
             throw NSError(domain: "Dicta", code: 2,
-                          userInfo: [NSLocalizedDescriptionKey: "Reconocimiento de voz no disponible"])
+                          userInfo: [NSLocalizedDescriptionKey: "Speech recognition unavailable"])
         }
         self.recognizer = recognizer
 

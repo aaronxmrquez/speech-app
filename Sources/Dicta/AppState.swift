@@ -194,7 +194,7 @@ final class AppState: ObservableObject {
         // Toque accidental: demasiado corto para ser un dictado real.
         if let started = recordingStartedAt, Date().timeIntervalSince(started) < 0.35 {
             engine.cancel()
-            showNotice("Mantén la tecla mientras hablas")
+            showNotice("Hold the key while you speak")
             return
         }
 
@@ -205,7 +205,7 @@ final class AppState: ObservableObject {
             guard self.phase == .transcribing else { return } // cancelado mientras tanto
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.isEmpty {
-                self.showNotice("No escuché nada")
+                self.showNotice("Didn't catch that")
             } else {
                 self.insert(trimmed)
             }

@@ -13,14 +13,14 @@ final class SettingsWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 638),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 860),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
             w.isMovableByWindowBackground = true
-            w.backgroundColor = NSColor(calibratedWhite: 0.04, alpha: 1)
+            w.backgroundColor = BrandWindow.backgroundColor
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
@@ -40,216 +40,158 @@ struct SettingsView: View {
     @State private var launchAtLoginError: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Ajustes")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(Theme.primary)
-                .padding(.top, 8)
+        VStack(spacing: 0) {
+            BrandHeader(title: "SETTINGS")
+                .padding(.top, 6)
 
-            section("ACTIVACIÓN") {
-                row("Modo") {
-                    Picker("", selection: $prefs.activationMode) {
-                        Text("Mantener tecla").tag(ActivationMode.hold)
-                        Text("Alternar ⌥␣").tag(ActivationMode.toggle)
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .frame(width: 210)
-                }
-                if prefs.activationMode == .hold {
-                    divider
-                    row("Tecla") {
-                        Picker("", selection: $prefs.holdKey) {
-                            ForEach(HoldKey.allCases) { key in
-                                Text(key.label).tag(key)
+            VStack(alignment: .leading, spacing: 24) {
+                section("ACTIVATION") {
+                    row("MODE") {
+                        HStack(spacing: 4) {
+                            ChipButton(label: "HOLD KEY", selected: prefs.activationMode == .hold) {
+                                prefs.activationMode = .hold
+                            }
+                            ChipButton(label: "TOGGLE", selected: prefs.activationMode == .toggle) {
+                                prefs.activationMode = .toggle
                             }
                         }
-                        .labelsHidden()
-                        .frame(width: 150)
+                    }
+                    BrandDivider()
+                    row("KEY") {
+                        MenuChip(
+                            options: HoldKey.allCases.map { ($0, $0.chipLabel) },
+                            selection: $prefs.holdKey
+                        )
                     }
                 }
-            }
 
-            section("MOTOR") {
-                row("Motor de voz") {
-                    Picker("", selection: $prefs.engine) {
-                        Text("Apple").tag(EngineKind.apple)
-                        Text("Whisper").tag(EngineKind.whisper)
+                section("ENGINE") {
+                    row("VOICE ENGINE") {
+                        HStack(spacing: 4) {
+                            ChipButton(label: "APPLE", selected: prefs.engine == .apple) {
+                                prefs.engine = .apple
+                            }
+                            ChipButton(label: "WHISPER", selected: prefs.engine == .whisper) {
+                                prefs.engine = .whisper
+                                if !models.modelReady && !models.isDownloading {
+                                    models.download()
+                                }
+                            }
+                        }
                     }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .frame(width: 180)
-                    .onChange(of: prefs.engine) { _, engine in
-                        if engine == .whisper && !models.modelReady && !models.isDownloading {
-                            models.download()
+                    if prefs.engine == .whisper {
+                        BrandDivider()
+                        row("LARGE-V3-TURBO MODEL") {
+                            modelStatus
                         }
                     }
                 }
-                if prefs.engine == .whisper {
-                    divider
-                    modelRow
-                }
-            }
 
-            section("IDIOMA") {
-                row("Dictar en") {
-                    Picker("", selection: $prefs.languageId) {
-                        ForEach(DictationLanguage.all) { language in
-                            Text(language.label).tag(language.id)
-                        }
+                section("LANGUAGE") {
+                    row("DICTATE IN") {
+                        MenuChip(
+                            options: DictationLanguage.all.map { ($0.id, $0.label.uppercased()) },
+                            selection: $prefs.languageId
+                        )
                     }
-                    .labelsHidden()
-                    .frame(width: 200)
                 }
-                if prefs.languageId == "auto" && prefs.engine == .apple {
-                    divider
-                    HStack {
-                        Text("La detección automática necesita el motor Whisper; con Apple se dicta en español.")
-                            .font(.system(size: 11))
+
+                section("GENERAL") {
+                    row("OPEN AT LOGIN") {
+                        BrandToggle(isOn: launchAtLoginBinding)
+                    }
+                    if let launchAtLoginError {
+                        Text(launchAtLoginError)
+                            .font(Theme.sans(11))
                             .foregroundStyle(Theme.secondary)
-                        Spacer()
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    BrandDivider()
+                    row("DICTATION SOUNDS") {
+                        BrandToggle(isOn: $prefs.playSounds)
+                    }
+                    BrandDivider()
+                    row("SAVE HISTORY") {
+                        BrandToggle(isOn: $prefs.saveHistory)
+                    }
                 }
             }
+            .padding(.horizontal, 30)
+            .padding(.top, 24)
 
-            section("GENERAL") {
-                row("Abrir al iniciar sesión") {
-                    Toggle("", isOn: $launchAtLogin)
-                        .labelsHidden()
-                        .toggleStyle(.switch)
-                        .onChange(of: launchAtLogin) { _, enabled in
-                            setLaunchAtLogin(enabled)
-                        }
-                }
-                divider
-                row("Sonidos de dictado") {
-                    Toggle("", isOn: $prefs.playSounds)
-                        .labelsHidden()
-                        .toggleStyle(.switch)
-                }
-                divider
-                row("Guardar historial") {
-                    Toggle("", isOn: $prefs.saveHistory)
-                        .labelsHidden()
-                        .toggleStyle(.switch)
-                }
-            }
+            Spacer(minLength: 14)
 
-            if let launchAtLoginError {
-                Text(launchAtLoginError)
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.secondary)
-            }
-
-            Spacer()
-
-            Text("Dicta \(Self.appVersion) — habla y el texto se escribe donde esté tu cursor.")
-                .font(.system(size: 11))
-                .foregroundStyle(Theme.tertiary)
+            BrandFooter(text: "Dicta is an app created by Aaron Márquez.")
+                .padding(.bottom, 16)
         }
-        .padding(28)
-        .frame(width: 400, height: 638, alignment: .topLeading)
+        .frame(width: 520, height: 860)
         .background(Theme.background)
-        .tint(Color.white.opacity(0.35))
         .preferredColorScheme(.dark)
     }
 
+    // MARK: filas y estados
+
     @ViewBuilder
-    private var modelRow: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Modelo large-v3-turbo")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Theme.primary)
-                Text(modelStatusText)
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.secondary)
-            }
-            Spacer()
-            if models.modelReady {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Theme.primary)
-            } else if models.isDownloading {
+    private var modelStatus: some View {
+        if models.modelReady {
+            StatusCircle(granted: true)
+        } else if models.isDownloading {
+            HStack(spacing: 10) {
                 ProgressView(value: models.progress)
                     .progressViewStyle(.linear)
-                    .frame(width: 110)
-                    .tint(.white)
-            } else {
-                Button(action: { models.download() }) {
-                    Text("Descargar")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 5)
-                        .background(Capsule().fill(Color.white))
+                    .frame(width: 90)
+                    .tint(Theme.accent)
+                Text("\(Int(models.progress * 100))%")
+                    .font(Theme.mono(12, .medium))
+                    .foregroundStyle(Theme.secondary)
+            }
+        } else {
+            ChipButton(label: "DOWNLOAD · 574 MB", selected: true) {
+                models.download()
+            }
+        }
+    }
+
+    private var launchAtLoginBinding: Binding<Bool> {
+        Binding(
+            get: { launchAtLogin },
+            set: { enabled in
+                launchAtLogin = enabled
+                do {
+                    if enabled {
+                        try SMAppService.mainApp.register()
+                    } else {
+                        try SMAppService.mainApp.unregister()
+                    }
+                    launchAtLoginError = nil
+                } catch {
+                    launchAtLogin = SMAppService.mainApp.status == .enabled
+                    launchAtLoginError = "To open at login, Dicta must be installed in /Applications."
                 }
-                .buttonStyle(.plain)
             }
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        )
     }
-
-    private var modelStatusText: String {
-        if models.modelReady { return "Listo · corre 100 % local con Metal" }
-        if models.isDownloading { return "Descargando… \(Int(models.progress * 100)) %" }
-        if let error = models.errorMessage { return error }
-        return "\(ModelManager.modelSizeMB) MB · se descarga una sola vez"
-    }
-
-    private static var appVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
-    }
-
-    private func setLaunchAtLogin(_ enabled: Bool) {
-        do {
-            if enabled {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
-            }
-            launchAtLoginError = nil
-        } catch {
-            launchAtLogin = SMAppService.mainApp.status == .enabled
-            launchAtLoginError = "Para abrir al iniciar sesión, Dicta debe estar en /Applications."
-        }
-    }
-
-    // MARK: componentes
 
     @ViewBuilder
-    private func section(_ title: String, @ViewBuilder content: () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.system(size: 10, weight: .semibold))
-                .tracking(1.2)
-                .foregroundStyle(Theme.tertiary)
-            VStack(spacing: 0) { content() }
-                .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
-                .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Theme.border, lineWidth: 1))
+    private func section(_ title: String, @ViewBuilder content: @escaping () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SectionLabel(text: title)
+            BrandCard { content() }
         }
     }
 
     private func row(_ label: String, @ViewBuilder control: () -> some View) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 13))
+                .font(Theme.mono(13, .medium))
+                .tracking(2)
                 .foregroundStyle(Theme.primary)
             Spacer()
             control()
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-    }
-
-    private var divider: some View {
-        Rectangle()
-            .fill(Theme.border)
-            .frame(height: 1)
-            .padding(.leading, 14)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
     }
 }

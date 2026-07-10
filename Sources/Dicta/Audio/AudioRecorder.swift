@@ -18,7 +18,7 @@ final class AudioRecorder {
         let format = input.outputFormat(forBus: 0)
         guard format.sampleRate > 0, format.channelCount > 0 else {
             throw NSError(domain: "Dicta", code: 1,
-                          userInfo: [NSLocalizedDescriptionKey: "No hay micrófono disponible"])
+                          userInfo: [NSLocalizedDescriptionKey: "No microphone available"])
         }
         input.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
             guard let self else { return }

@@ -14,7 +14,7 @@ final class WhisperContext {
         params.flash_attn = true
         guard let ctx = whisper_init_from_file_with_params(modelPath, params) else {
             throw NSError(domain: "Dicta", code: 3,
-                          userInfo: [NSLocalizedDescriptionKey: "No se pudo cargar el modelo Whisper"])
+                          userInfo: [NSLocalizedDescriptionKey: "Couldn't load the Whisper model"])
         }
         self.ctx = ctx
     }

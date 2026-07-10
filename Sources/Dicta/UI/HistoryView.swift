@@ -12,14 +12,14 @@ final class HistoryWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 400, height: 500),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 720),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
             w.isMovableByWindowBackground = true
-            w.backgroundColor = NSColor(calibratedWhite: 0.04, alpha: 1)
+            w.backgroundColor = BrandWindow.backgroundColor
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
@@ -38,54 +38,65 @@ struct HistoryView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Historial")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(Theme.primary)
-                Spacer()
-                if !history.records.isEmpty {
-                    Button("Borrar todo") { history.clear() }
-                        .buttonStyle(.plain)
-                        .font(.system(size: 11))
-                        .foregroundStyle(Theme.secondary)
-                }
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 30)
-            .padding(.bottom, 16)
+            BrandHeader(title: "HISTORY")
+                .padding(.top, 6)
 
             if history.records.isEmpty {
                 Spacer()
-                VStack(spacing: 10) {
-                    Image(systemName: "waveform")
-                        .font(.system(size: 26, weight: .medium))
-                        .foregroundStyle(Theme.tertiary)
-                    Text("Aún no hay dictados")
-                        .font(.system(size: 13))
+                VStack(spacing: 12) {
+                    Text("NOTHING DICTATED YET")
+                        .font(Theme.mono(15, .medium))
+                        .tracking(3)
+                        .foregroundStyle(Theme.secondary)
+                    Text("Hold your key and start talking.")
+                        .font(Theme.sans(12.5))
                         .foregroundStyle(Theme.tertiary)
                 }
                 Spacer()
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
+                HStack(alignment: .firstTextBaseline) {
+                    SectionLabel(text: "RECENT")
+                    Spacer()
+                    Button {
+                        history.clear()
+                    } label: {
+                        Text("CLEAR ALL")
+                            .font(Theme.mono(11, .medium))
+                            .tracking(1.5)
+                            .foregroundStyle(Theme.tertiary)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 30)
+                .padding(.top, 24)
+                .padding(.bottom, 12)
+
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(spacing: 10) {
                         ForEach(history.records) { record in
                             HistoryRow(record: record, copied: copiedId == record.id) {
                                 copy(record)
                             }
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, 16)
                 }
-                Text("Clic en un dictado para copiarlo")
-                    .font(.system(size: 11))
+
+                Text("CLICK A DICTATION TO COPY IT")
+                    .font(Theme.mono(10, .medium))
+                    .tracking(2)
                     .foregroundStyle(Theme.tertiary)
-                    .padding(.bottom, 14)
+                    .padding(.bottom, 8)
             }
+
+            BrandFooter(text: "Dicta is an app created by Aaron Márquez.")
+                .padding(.bottom, 16)
         }
-        .frame(width: 400, height: 500)
+        .frame(width: 520, height: 720)
         .background(Theme.background)
         .preferredColorScheme(.dark)
+        .environment(\.locale, Locale(identifier: "en_US"))
     }
 
     private func copy(_ record: DictationRecord) {
@@ -106,32 +117,59 @@ struct HistoryRow: View {
 
     var body: some View {
         Button(action: onCopy) {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text(record.text)
-                    .font(.system(size: 13))
+                    .font(Theme.sans(13))
                     .foregroundStyle(Theme.primary)
                     .lineLimit(3)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                HStack(spacing: 6) {
-                    Text(record.date, format: .relative(presentation: .named))
-                    if let app = record.appName {
-                        Text("·")
-                        Text(app)
-                    }
+
+                HStack(spacing: 8) {
+                    Text(meta)
+                        .font(Theme.mono(10.5, .medium))
+                        .tracking(1.2)
+                        .foregroundStyle(Theme.tertiary)
                     Spacer()
-                    Image(systemName: copied ? "checkmark" : "doc.on.doc")
-                        .foregroundStyle(copied ? Theme.primary : Theme.tertiary)
+                    if copied {
+                        HStack(spacing: 5) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 10, weight: .bold))
+                            Text("COPIED")
+                                .font(Theme.mono(10, .semibold))
+                                .tracking(1.5)
+                        }
+                        .foregroundStyle(Theme.accent)
+                    } else {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Theme.tertiary)
+                    }
                 }
-                .font(.system(size: 11))
-                .foregroundStyle(Theme.tertiary)
             }
-            .padding(12)
-            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Theme.border, lineWidth: 1))
-            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .padding(18)
+            .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
         .buttonStyle(.plain)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Theme.card)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(copied ? Theme.accent.opacity(0.4) : Theme.cardBorder, lineWidth: 1)
+        )
+        .animation(.easeInOut(duration: 0.18), value: copied)
+    }
+
+    private var meta: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.unitsStyle = .abbreviated
+        var text = formatter.localizedString(for: record.date, relativeTo: Date()).uppercased()
+        if let app = record.appName {
+            text += " · \(app.uppercased())"
+        }
+        return text
     }
 }

@@ -53,7 +53,7 @@ struct HUDView: View {
         case .done:
             Image(systemName: "checkmark")
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(Theme.primary)
+                .foregroundStyle(Theme.accent)
                 .transition(.scale.combined(with: .opacity))
         case .notice:
             Image(systemName: "exclamationmark.circle")
@@ -68,18 +68,18 @@ struct HUDView: View {
     private var content: some View {
         switch state.phase {
         case .recording:
-            Text(state.partialText.isEmpty ? "Escuchando…" : state.partialText)
+            Text(state.partialText.isEmpty ? "Listening…" : state.partialText)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(state.partialText.isEmpty ? Theme.tertiary : Theme.primary)
                 .lineLimit(1)
                 .truncationMode(.head) // se ve el final de la frase, lo recién dictado
                 .frame(maxWidth: .infinity, alignment: .leading)
         case .transcribing:
-            statusText("Transcribiendo…", style: Theme.secondary)
+            statusText("Transcribing…", style: Theme.secondary)
         case .inserting:
-            statusText("Escribiendo…", style: Theme.secondary)
+            statusText("Typing…", style: Theme.secondary)
         case .done:
-            statusText("Listo", style: Theme.primary)
+            statusText("Done", style: Theme.primary)
         case .notice(let message):
             statusText(message, style: Theme.secondary)
         case .idle:

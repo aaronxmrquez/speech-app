@@ -16,14 +16,14 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 440, height: 560),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 780),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
             w.isMovableByWindowBackground = true
-            w.backgroundColor = NSColor(calibratedWhite: 0.04, alpha: 1)
+            w.backgroundColor = BrandWindow.backgroundColor
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
@@ -60,93 +60,78 @@ struct OnboardingView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(Theme.card)
-                        .frame(width: 64, height: 64)
-                        .overlay(Circle().strokeBorder(Theme.border, lineWidth: 1))
-                    if let logoURL = Bundle.main.url(forResource: "LogoWhite", withExtension: "png"),
-                       let logo = NSImage(contentsOf: logoURL) {
-                        Image(nsImage: logo)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 34)
-                    } else {
-                        Image(systemName: "waveform")
-                            .font(.system(size: 26, weight: .medium))
-                            .foregroundStyle(Theme.primary)
-                    }
-                }
-                Text("Dicta")
-                    .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(Theme.primary)
-                Text("Habla y escribe en cualquier app.\nPara funcionar necesita tres permisos de macOS.")
-                    .font(.system(size: 12.5))
-                    .foregroundStyle(Theme.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(3)
-            }
-            .padding(.top, 36)
-            .padding(.bottom, 28)
+            BrandHeader(title: "SET UP")
+                .padding(.top, 6)
 
-            VStack(spacing: 10) {
-                PermissionRow(
+            VStack(spacing: 14) {
+                PermissionCard(
                     icon: "mic",
-                    title: "Micrófono",
-                    detail: "Para escuchar tu voz mientras dictas.",
+                    title: "MICROPHONE",
+                    detail: "To listen to your voice while you speak.",
                     granted: permissions.microphone
                 ) {
                     permissions.requestMicrophone()
                 }
-                PermissionRow(
+                PermissionCard(
                     icon: "waveform",
-                    title: "Reconocimiento de voz",
-                    detail: "Para convertir tu voz en texto.",
+                    title: "SPEECH RECOGNITION",
+                    detail: "To convert your voice into text.",
                     granted: permissions.speechRecognition
                 ) {
                     permissions.requestSpeechRecognition()
                 }
-                PermissionRow(
+                PermissionCard(
                     icon: "accessibility",
-                    title: "Accesibilidad",
-                    detail: "Para detectar la tecla de dictado y escribir el texto.",
+                    title: "ACCESSIBILITY",
+                    detail: "To detect your hotkey and type the text.",
                     granted: permissions.accessibility
                 ) {
                     permissions.requestAccessibility()
                     permissions.openAccessibilitySettings()
                 }
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 30)
+            .padding(.top, 24)
 
-            Spacer()
+            Spacer(minLength: 20)
 
-            VStack(spacing: 12) {
-                Button(action: onReady) {
-                    Text("Empezar a dictar")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(permissions.allGranted ? Color.black : Theme.tertiary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .background(Capsule().fill(permissions.allGranted ? Color.white : Theme.card))
+            HStack(alignment: .bottom, spacing: 16) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("BECAUSE WE KNOW")
+                        .foregroundStyle(Theme.tertiary)
+                    Text("YOU HATE TYPING.")
+                        .foregroundStyle(Theme.tertiary)
+                    Text("USE DICTA.")
+                        .foregroundStyle(Theme.primary)
                 }
-                .buttonStyle(.plain)
-                .disabled(!permissions.allGranted)
+                .font(Theme.mono(24, .medium))
+                .tracking(2)
 
-                Text("Mantén ⌘ derecha y habla — al soltarla, el texto se escribe solo.")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Theme.tertiary)
+                Spacer()
+
+                PrimaryButton(label: "LET'S START", enabled: permissions.allGranted, action: onReady)
             }
-            .padding(.horizontal, 28)
-            .padding(.bottom, 28)
+            .padding(.horizontal, 30)
+
+            BrandFooter(text: footerText)
+                .padding(.top, 22)
+                .padding(.bottom, 16)
         }
-        .frame(width: 440, height: 560)
+        .frame(width: 560, height: 780)
         .background(Theme.background)
         .preferredColorScheme(.dark)
     }
+
+    private var footerText: String {
+        if permissions.allGranted {
+            let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+            return "Dicta \(version) — Just speak and the text appears wherever your cursor is."
+        }
+        return "Dicta is an app created by Aaron Márquez."
+    }
 }
 
-struct PermissionRow: View {
+struct PermissionCard: View {
     let icon: String
     let title: String
     let detail: String
@@ -154,45 +139,45 @@ struct PermissionRow: View {
     let action: () -> Void
 
     var body: some View {
-        HStack(spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Theme.primary)
-                .frame(width: 36, height: 36)
-                .background(Circle().fill(Theme.card))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Theme.primary)
-                Text(detail)
-                    .font(.system(size: 11.5))
-                    .foregroundStyle(Theme.secondary)
-            }
-
-            Spacer()
-
-            if granted {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 20))
-                    .foregroundStyle(Theme.primary)
-                    .transition(.scale.combined(with: .opacity))
-            } else {
-                Button(action: action) {
-                    Text("Permitir")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 6)
-                        .background(Capsule().fill(Color.white))
+        Button {
+            if !granted { action() }
+        } label: {
+            HStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white.opacity(0.04))
+                        .overlay(Circle().strokeBorder(Theme.cardBorder, lineWidth: 1))
+                        .frame(width: 46, height: 46)
+                    Image(systemName: icon)
+                        .font(.system(size: 17, weight: .light))
+                        .foregroundStyle(Theme.secondary)
                 }
-                .buttonStyle(.plain)
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(title)
+                        .font(Theme.mono(15, .medium))
+                        .tracking(2.5)
+                        .foregroundStyle(Theme.primary)
+                    Text(detail)
+                        .font(Theme.sans(12.5))
+                        .foregroundStyle(Theme.secondary)
+                }
+
+                Spacer()
+
+                StatusCircle(granted: granted)
             }
+            .padding(22)
+            .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         }
-        .padding(14)
-        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.card))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .strokeBorder(Theme.border, lineWidth: 1))
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: granted)
+        .buttonStyle(.plain)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Theme.card)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .strokeBorder(Theme.cardBorder, lineWidth: 1)
+        )
     }
 }

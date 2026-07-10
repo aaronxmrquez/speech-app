@@ -74,7 +74,7 @@ cp Support/Info.plist "$APP/Contents/Info.plist"
 if [ -f Support/AppIcon.icns ]; then
   cp Support/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 fi
-for asset in MenuBarIcon.png LogoWhite.png; do
+for asset in MenuBarIcon.png LogoWhite.png logo.png; do
   [ -f "Support/$asset" ] && cp "Support/$asset" "$APP/Contents/Resources/$asset"
 done
 

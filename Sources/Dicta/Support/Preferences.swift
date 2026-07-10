@@ -22,9 +22,17 @@ enum HoldKey: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .rightCommand: return "⌘ derecha"
-        case .rightOption: return "⌥ derecha"
-        case .fn: return "fn 🌐"
+        case .rightCommand: return "right ⌘"
+        case .rightOption: return "right ⌥"
+        case .fn: return "fn"
+        }
+    }
+
+    var chipLabel: String {
+        switch self {
+        case .rightCommand: return "RIGHT ⌘"
+        case .rightOption: return "RIGHT ⌥"
+        case .fn: return "FN"
         }
     }
 }
@@ -35,9 +43,9 @@ struct DictationLanguage: Identifiable, Equatable {
     let short: String
 
     static let all: [DictationLanguage] = [
-        .init(id: "auto", label: "Auto (detectar idioma)", short: "AUTO"),
-        .init(id: "es-MX", label: "Español (Latinoamérica)", short: "ES"),
-        .init(id: "es-ES", label: "Español (España)", short: "ES"),
+        .init(id: "auto", label: "Auto (detect language)", short: "AUTO"),
+        .init(id: "es-MX", label: "Spanish (Latin America)", short: "ES"),
+        .init(id: "es-ES", label: "Spanish (Spain)", short: "ES"),
         .init(id: "en-US", label: "English (US)", short: "EN"),
     ]
 

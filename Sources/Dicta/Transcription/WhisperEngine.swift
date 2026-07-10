@@ -45,7 +45,7 @@ final class WhisperEngine: TranscriptionEngine {
     func begin(localeId: String, onPartial: @escaping (String) -> Void) throws {
         guard FileManager.default.fileExists(atPath: modelURL.path) else {
             throw NSError(domain: "Dicta", code: 4,
-                          userInfo: [NSLocalizedDescriptionKey: "Falta el modelo Whisper — descárgalo en Ajustes"])
+                          userInfo: [NSLocalizedDescriptionKey: "Whisper model missing — download it in Settings"])
         }
         preloadContext()
 

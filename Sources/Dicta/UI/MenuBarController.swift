@@ -76,12 +76,12 @@ final class MenuBarController: NSObject, NSMenuDelegate {
 
         if state.hotkeyActive {
             let hint = state.prefs.activationMode == .hold
-                ? "Mantén \(state.prefs.holdKey.label) y habla"
-                : "⌥ Espacio para dictar"
+                ? "Hold \(state.prefs.holdKey.label) and speak"
+                : "⌥ Space to dictate"
             menu.addItem(disabledItem(hint))
         } else {
-            menu.addItem(disabledItem("⚠︎ Hotkey inactivo — falta Accesibilidad"))
-            let grant = NSMenuItem(title: "Conceder Accesibilidad…",
+            menu.addItem(disabledItem("⚠︎ Hotkey inactive — Accessibility needed"))
+            let grant = NSMenuItem(title: "Grant Accessibility…",
                                    action: #selector(grantAccessibility), keyEquivalent: "")
             grant.target = self
             menu.addItem(grant)
@@ -89,13 +89,13 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         let dictate = NSMenuItem(
-            title: state.phase == .recording ? "Detener dictado" : "Dictar ahora",
+            title: state.phase == .recording ? "Stop dictation" : "Dictate now",
             action: #selector(dictateNow), keyEquivalent: "")
         dictate.target = self
         menu.addItem(dictate)
         menu.addItem(.separator())
 
-        let languageRoot = NSMenuItem(title: "Idioma", action: nil, keyEquivalent: "")
+        let languageRoot = NSMenuItem(title: "Language", action: nil, keyEquivalent: "")
         let languageMenu = NSMenu()
         for language in DictationLanguage.all {
             let item = NSMenuItem(title: language.label, action: #selector(selectLanguage(_:)), keyEquivalent: "")
@@ -107,24 +107,24 @@ final class MenuBarController: NSObject, NSMenuDelegate {
         languageRoot.submenu = languageMenu
         menu.addItem(languageRoot)
 
-        let historyItem = NSMenuItem(title: "Historial…", action: #selector(openHistory), keyEquivalent: "")
+        let historyItem = NSMenuItem(title: "History…", action: #selector(openHistory), keyEquivalent: "")
         historyItem.target = self
         menu.addItem(historyItem)
 
-        let settings = NSMenuItem(title: "Ajustes…", action: #selector(openSettings), keyEquivalent: ",")
+        let settings = NSMenuItem(title: "Settings…", action: #selector(openSettings), keyEquivalent: ",")
         settings.target = self
         menu.addItem(settings)
 
-        let permissions = NSMenuItem(title: "Permisos…", action: #selector(openOnboarding), keyEquivalent: "")
+        let permissions = NSMenuItem(title: "Permissions…", action: #selector(openOnboarding), keyEquivalent: "")
         permissions.target = self
         menu.addItem(permissions)
 
-        let relaunch = NSMenuItem(title: "Reiniciar Dicta", action: #selector(relaunchApp), keyEquivalent: "")
+        let relaunch = NSMenuItem(title: "Restart Dicta", action: #selector(relaunchApp), keyEquivalent: "")
         relaunch.target = self
         menu.addItem(relaunch)
 
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Salir de Dicta",
+        menu.addItem(NSMenuItem(title: "Quit Dicta",
                                 action: #selector(NSApplication.terminate(_:)),
                                 keyEquivalent: "q"))
     }

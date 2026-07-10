@@ -15,8 +15,17 @@ enum PreviewRenderer {
         // Onboarding con permisos mixtos, para ver ambos estados de fila.
         permissions.microphone = true
         render(OnboardingView(permissions: permissions, onReady: {}),
-               size: CGSize(width: 440, height: 560),
+               size: CGSize(width: 560, height: 780),
                to: dir.appendingPathComponent("onboarding.png"))
+
+        // Estado "activo": todos los permisos concedidos.
+        let grantedPermissions = Permissions()
+        grantedPermissions.microphone = true
+        grantedPermissions.speechRecognition = true
+        grantedPermissions.accessibility = true
+        render(OnboardingView(permissions: grantedPermissions, onReady: {}),
+               size: CGSize(width: 560, height: 780),
+               to: dir.appendingPathComponent("onboarding-active.png"))
 
         let state = AppState(prefs: prefs, permissions: permissions, history: HistoryStore.preview())
         state.applyPreview(phase: .recording,
@@ -35,11 +44,11 @@ enum PreviewRenderer {
         // Ajustes usa controles AppKit (pickers, switches) que ImageRenderer no
         // sabe dibujar: renderizar la ventana real con cacheDisplay.
         renderInWindow(SettingsView(prefs: prefs),
-                       size: CGSize(width: 400, height: 638),
+                       size: CGSize(width: 520, height: 860),
                        to: dir.appendingPathComponent("settings.png"))
 
         renderInWindow(HistoryView(history: HistoryStore.preview()),
-                       size: CGSize(width: 400, height: 500),
+                       size: CGSize(width: 520, height: 720),
                        to: dir.appendingPathComponent("history.png"))
 
         return true
