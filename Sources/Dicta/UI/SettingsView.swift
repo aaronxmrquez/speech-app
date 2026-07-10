@@ -42,7 +42,6 @@ struct SettingsView: View {
     var body: some View {
         VStack(spacing: 0) {
             BrandHeader(title: "SETTINGS")
-                .padding(.top, 6)
 
             VStack(alignment: .leading, spacing: 24) {
                 section("ACTIVATION") {

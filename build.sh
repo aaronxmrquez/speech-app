@@ -77,6 +77,10 @@ fi
 for asset in MenuBarIcon.png LogoWhite.png logo.png; do
   [ -f "Support/$asset" ] && cp "Support/$asset" "$APP/Contents/Resources/$asset"
 done
+if [ -d Support/Fonts ]; then
+  mkdir -p "$APP/Contents/Resources/Fonts"
+  cp Support/Fonts/*.ttf "$APP/Contents/Resources/Fonts/"
+fi
 
 # Firmar con el certificado local estable si existe (los permisos TCC
 # sobreviven las recompilaciones); si no, ad-hoc. Crear el certificado con

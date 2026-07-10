@@ -15,7 +15,7 @@ enum PreviewRenderer {
         // Onboarding con permisos mixtos, para ver ambos estados de fila.
         permissions.microphone = true
         render(OnboardingView(permissions: permissions, onReady: {}),
-               size: CGSize(width: 560, height: 780),
+               size: CGSize(width: 560, height: 760),
                to: dir.appendingPathComponent("onboarding.png"))
 
         // Estado "activo": todos los permisos concedidos.
@@ -24,7 +24,7 @@ enum PreviewRenderer {
         grantedPermissions.speechRecognition = true
         grantedPermissions.accessibility = true
         render(OnboardingView(permissions: grantedPermissions, onReady: {}),
-               size: CGSize(width: 560, height: 780),
+               size: CGSize(width: 560, height: 760),
                to: dir.appendingPathComponent("onboarding-active.png"))
 
         let state = AppState(prefs: prefs, permissions: permissions, history: HistoryStore.preview())

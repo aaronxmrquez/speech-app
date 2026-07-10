@@ -16,7 +16,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 780),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 760),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -61,7 +61,6 @@ struct OnboardingView: View {
     var body: some View {
         VStack(spacing: 0) {
             BrandHeader(title: "SET UP")
-                .padding(.top, 6)
 
             VStack(spacing: 14) {
                 PermissionCard(
@@ -93,8 +92,6 @@ struct OnboardingView: View {
             .padding(.horizontal, 30)
             .padding(.top, 24)
 
-            Spacer(minLength: 20)
-
             HStack(alignment: .bottom, spacing: 16) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("BECAUSE WE KNOW")
@@ -112,12 +109,13 @@ struct OnboardingView: View {
                 PrimaryButton(label: "LET'S START", enabled: permissions.allGranted, action: onReady)
             }
             .padding(.horizontal, 30)
+            .padding(.top, 60) // gap fijo entre las cards y el bloque final
 
             BrandFooter(text: footerText)
-                .padding(.top, 22)
+                .padding(.top, 24)
                 .padding(.bottom, 16)
         }
-        .frame(width: 560, height: 780)
+        .frame(width: 560, height: 760)
         .background(Theme.background)
         .preferredColorScheme(.dark)
     }

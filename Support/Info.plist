@@ -2,33 +2,35 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleName</key>
-	<string>Dicta</string>
+	<key>ATSApplicationFontsPath</key>
+	<string>Fonts</string>
 	<key>CFBundleDisplayName</key>
 	<string>Dicta</string>
+	<key>CFBundleExecutable</key>
+	<string>Dicta</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.aaronmarquez.dicta</string>
-	<key>CFBundleExecutable</key>
+	<key>CFBundleName</key>
 	<string>Dicta</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.1.0</string>
+	<string>3.1.1</string>
 	<key>CFBundleVersion</key>
-	<string>6</string>
-	<key>CFBundleIconFile</key>
-	<string>AppIcon</string>
+	<string>7</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
 	<key>LSUIElement</key>
 	<true/>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Dicta uses the microphone to hear your voice while you dictate.</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Dicta turns your voice into text and types it wherever your cursor is.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 Aaron Marquez</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Dicta uses the microphone to hear your voice while you dictate.</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Dicta turns your voice into text and types it wherever your cursor is.</string>
 </dict>
 </plist>

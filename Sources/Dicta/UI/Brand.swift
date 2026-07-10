@@ -13,7 +13,6 @@ struct DotPatternView: View {
                 let spacing: CGFloat = 14
                 let dotRadius: CGFloat = 1.1
                 let center = CGPoint(x: size.width / 2, y: size.height * 0.48)
-                let maxDistance = hypot(size.width / 2, size.height / 2) * 1.05
 
                 let columns = Int(size.width / spacing) + 1
                 let rows = Int(size.height / spacing) + 1
@@ -21,16 +20,21 @@ struct DotPatternView: View {
                     for column in 0...columns {
                         let x = CGFloat(column) * spacing + spacing / 2
                         let y = CGFloat(row) * spacing + spacing / 2
-                        let distance = hypot(x - center.x, y - center.y)
-                        let falloff = max(0, 1 - distance / maxDistance)
+
+                        // El brillo cae solo hacia los costados: las filas de
+                        // arriba llegan nítidas al borde superior de la ventana
+                        // (el degradado inferior lo pone la máscara del header).
+                        let dxNorm = abs(x - center.x) / (size.width * 0.62)
+                        let falloff = max(0, 1 - dxNorm * dxNorm)
 
                         // titileo determinista por punto + onda radial lenta
+                        let distance = hypot(x - center.x, y - center.y)
                         let seed = Double(column) * 12.9898 + Double(row) * 78.233
                         let phase = (sin(seed) * 43758.5453).truncatingRemainder(dividingBy: 1)
                         let wave = sin(time * 1.6 - Double(distance) * 0.045 + phase * .pi * 2)
                         let twinkle = 0.55 + 0.45 * wave
 
-                        let opacity = Double(falloff * falloff) * twinkle * 0.55 + 0.03
+                        let opacity = Double(falloff * sqrt(falloff)) * twinkle * 0.5 + 0.03
                         guard opacity > 0.04 else { continue }
 
                         let rect = CGRect(x: x - dotRadius, y: y - dotRadius,
@@ -73,13 +77,13 @@ struct BrandHeader: View {
         VStack(spacing: 18) {
             ZStack {
                 DotPatternView()
-                    .frame(height: 150)
+                    .frame(height: 168)
                     .mask(
                         LinearGradient(colors: [.black, .black, .clear],
                                        startPoint: .top, endPoint: .bottom)
                     )
                 LogoTileView()
-                    .offset(y: 8)
+                    .offset(y: 14)
             }
             Text(title)
                 .font(Theme.mono(24, .medium))

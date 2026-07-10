@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 /// Sistema visual de Dicta (branding 2.0): carbón profundo, tipografía mono
 /// en mayúsculas con tracking amplio, y verde eléctrico como único acento.
@@ -14,9 +15,17 @@ enum Theme {
     static let tertiary = Color.white.opacity(0.32)
     static let accent = Color(red: 0.22, green: 0.84, blue: 0.06) // verde #38D610
 
-    // Tipografía: mono para titulares/labels/controles, sans para descripciones.
+    // Tipografía: Space Mono (embebida en Resources/Fonts) para titulares,
+    // labels y controles; sans del sistema para descripciones.
+    private static let spaceMonoAvailable = NSFont(name: "SpaceMono-Regular", size: 12) != nil
+
     static func mono(_ size: CGFloat, _ weight: Font.Weight = .medium) -> Font {
-        .system(size: size, weight: weight, design: .monospaced)
+        guard spaceMonoAvailable else {
+            return .system(size: size, weight: weight, design: .monospaced)
+        }
+        let boldWeights: Set<Font.Weight> = [.semibold, .bold, .heavy, .black]
+        let name = boldWeights.contains(weight) ? "SpaceMono-Bold" : "SpaceMono-Regular"
+        return .custom(name, size: size)
     }
 
     static func sans(_ size: CGFloat, _ weight: Font.Weight = .regular) -> Font {

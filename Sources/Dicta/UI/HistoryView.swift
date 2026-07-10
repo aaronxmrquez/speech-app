@@ -39,7 +39,6 @@ struct HistoryView: View {
     var body: some View {
         VStack(spacing: 0) {
             BrandHeader(title: "HISTORY")
-                .padding(.top, 6)
 
             if history.records.isEmpty {
                 Spacer()
