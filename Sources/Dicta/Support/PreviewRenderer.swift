@@ -44,7 +44,7 @@ enum PreviewRenderer {
         // Ajustes usa controles AppKit (pickers, switches) que ImageRenderer no
         // sabe dibujar: renderizar la ventana real con cacheDisplay.
         renderInWindow(SettingsView(prefs: prefs),
-                       size: CGSize(width: 520, height: 860),
+                       size: CGSize(width: 520, height: 800),
                        to: dir.appendingPathComponent("settings.png"))
 
         renderInWindow(HistoryView(history: HistoryStore.preview()),

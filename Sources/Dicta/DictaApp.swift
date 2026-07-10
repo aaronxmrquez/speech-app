@@ -66,6 +66,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
+    // Solo una ventana de Dicta a la vez: abrir una cierra las demás.
+    private func closeOtherWindows(keeping keep: AnyObject?) {
+        if settingsWindow !== keep { settingsWindow?.close() }
+        if historyWindow !== keep { historyWindow?.close() }
+        if onboardingWindow !== keep { onboardingWindow?.close() }
+    }
+
     func showOnboarding() {
         if onboardingWindow == nil {
             onboardingWindow = OnboardingWindowController(permissions: permissions, prefs: prefs) { [weak self] in
@@ -78,6 +85,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+        closeOtherWindows(keeping: onboardingWindow)
         onboardingWindow?.show()
     }
 
@@ -85,6 +93,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if settingsWindow == nil {
             settingsWindow = SettingsWindowController(prefs: prefs)
         }
+        closeOtherWindows(keeping: settingsWindow)
         settingsWindow?.show()
     }
 
@@ -92,6 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if historyWindow == nil {
             historyWindow = HistoryWindowController(history: appState.history)
         }
+        closeOtherWindows(keeping: historyWindow)
         historyWindow?.show()
     }
 

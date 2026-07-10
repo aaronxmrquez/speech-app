@@ -13,7 +13,7 @@ final class SettingsWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 860),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 800),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -31,6 +31,10 @@ final class SettingsWindowController {
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)
     }
+
+    func close() {
+        window?.close()
+    }
 }
 
 struct SettingsView: View {
@@ -41,9 +45,9 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            BrandHeader(title: "SETTINGS")
+            BrandHeader(title: "SETTINGS", compact: true)
 
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 14) {
                 section("ACTIVATION") {
                     row("MODE") {
                         HStack(spacing: 4) {
@@ -83,6 +87,7 @@ struct SettingsView: View {
                         row("LARGE-V3-TURBO MODEL") {
                             modelStatus
                         }
+                        .frame(minHeight: 50)
                     }
                 }
 
@@ -118,14 +123,13 @@ struct SettingsView: View {
                 }
             }
             .padding(.horizontal, 30)
-            .padding(.top, 24)
-
-            Spacer(minLength: 14)
+            .padding(.top, 16)
 
             BrandFooter(text: "Dicta is an app created by Aaron Márquez.")
+                .padding(.top, 24)
                 .padding(.bottom, 16)
         }
-        .frame(width: 520, height: 860)
+        .frame(width: 520, height: 800)
         .background(Theme.background)
         .preferredColorScheme(.dark)
     }
@@ -135,7 +139,7 @@ struct SettingsView: View {
     @ViewBuilder
     private var modelStatus: some View {
         if models.modelReady {
-            StatusCircle(granted: true)
+            StatusCircle(granted: true, size: 28)
         } else if models.isDownloading {
             HStack(spacing: 10) {
                 ProgressView(value: models.progress)
@@ -191,6 +195,6 @@ struct SettingsView: View {
             control()
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 16)
+        .padding(.vertical, 10)
     }
 }

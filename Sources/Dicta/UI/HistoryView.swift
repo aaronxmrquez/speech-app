@@ -30,6 +30,10 @@ final class HistoryWindowController {
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)
     }
+
+    func close() {
+        window?.close()
+    }
 }
 
 struct HistoryView: View {
@@ -82,14 +86,10 @@ struct HistoryView: View {
                     .padding(.bottom, 16)
                 }
 
-                Text("CLICK A DICTATION TO COPY IT")
-                    .font(Theme.mono(10, .medium))
-                    .tracking(2)
-                    .foregroundStyle(Theme.tertiary)
-                    .padding(.bottom, 8)
             }
 
             BrandFooter(text: "Dicta is an app created by Aaron Márquez.")
+                .padding(.top, 24)
                 .padding(.bottom, 16)
         }
         .frame(width: 520, height: 720)

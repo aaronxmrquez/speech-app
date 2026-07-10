@@ -70,23 +70,25 @@ struct LogoTileView: View {
 }
 
 /// Cabecera compartida: puntos animados + tile del logo + título mono.
+/// `compact` reduce las alturas para ventanas con mucho contenido (Settings).
 struct BrandHeader: View {
     let title: String
+    var compact = false
 
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: compact ? 12 : 18) {
             ZStack {
                 DotPatternView()
-                    .frame(height: 168)
+                    .frame(height: compact ? 144 : 168)
                     .mask(
                         LinearGradient(colors: [.black, .black, .clear],
                                        startPoint: .top, endPoint: .bottom)
                     )
-                LogoTileView()
-                    .offset(y: 14)
+                LogoTileView(size: compact ? 64 : 72)
+                    .offset(y: compact ? 10 : 14)
             }
             Text(title)
-                .font(Theme.mono(24, .medium))
+                .font(Theme.mono(compact ? 22 : 24, .medium))
                 .tracking(7)
                 .foregroundStyle(Theme.primary)
         }
@@ -128,18 +130,23 @@ struct MenuChip<Option: Hashable>: View {
                 Button(option.label) { selection = option.value }
             }
         } label: {
-            Text(currentLabel)
-                .font(Theme.mono(12, .medium))
-                .tracking(1.5)
-                .foregroundStyle(Theme.primary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 9)
+            HStack(spacing: 7) {
+                Text(currentLabel)
+                    .font(Theme.mono(12, .medium))
+                    .tracking(1.5)
+                    .foregroundStyle(Theme.primary)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(Theme.tertiary)
+            }
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        // El borde va sobre el Menu (no sobre el label): Menu re-envuelve su
-        // label y descarta los fondos que éste traiga.
+        // Padding FUERA del Menu (si va en el label, Menu lo trunca) pero
+        // dentro del borde: mismas métricas que ChipButton.
+        .padding(.horizontal, 14)
+        .padding(.vertical, 9)
         .overlay(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.6), lineWidth: 1.2)
@@ -216,15 +223,16 @@ struct BrandDivider: View {
 /// Círculo de estado de permiso: verde al concederse.
 struct StatusCircle: View {
     let granted: Bool
+    var size: CGFloat = 34
 
     var body: some View {
         ZStack {
             Circle()
                 .fill(granted ? Theme.accent : Color.white.opacity(0.04))
                 .overlay(Circle().strokeBorder(granted ? .clear : Color.white.opacity(0.16), lineWidth: 1.2))
-                .frame(width: 34, height: 34)
+                .frame(width: size, height: size)
             Image(systemName: "checkmark")
-                .font(.system(size: 13, weight: .bold))
+                .font(.system(size: size * 0.38, weight: .bold))
                 .foregroundStyle(granted ? Color.black : Theme.tertiary)
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: granted)

@@ -45,6 +45,10 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         window?.close() // windowWillClose detiene el sondeo y notifica
     }
 
+    func close() {
+        window?.close()
+    }
+
     func windowWillClose(_ notification: Notification) {
         permissions.stopPolling()
         if permissions.allGranted {
