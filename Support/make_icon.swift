@@ -7,16 +7,17 @@
 // - MenuBarIcon.png y LogoWhite.png: variantes blancas del logo para la app.
 //
 // Uso: swiftc -sdk <sdk> -o /tmp/make_icon Support/make_icon.swift
-//      /tmp/make_icon <logo.png> <dir-proyecto> [arte-dock.png]
+//      /tmp/make_icon <logo.png> <dir-proyecto> [arte-dock.png] [arte-menubar.png]
 import AppKit
 
 guard CommandLine.arguments.count > 2 else {
-    print("uso: make_icon <logo.png> <dir-proyecto> [arte-dock.png]")
+    print("uso: make_icon <logo.png> <dir-proyecto> [arte-dock.png] [arte-menubar.png]")
     exit(1)
 }
 let logoPath = CommandLine.arguments[1]
 let projectDir = CommandLine.arguments[2]
 let dockArtPath = CommandLine.arguments.count > 3 ? CommandLine.arguments[3] : nil
+let menuBarArtPath = CommandLine.arguments.count > 4 ? CommandLine.arguments[4] : nil
 
 guard let logoImage = NSImage(contentsOfFile: logoPath),
       let logoCG = logoImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
@@ -164,8 +165,31 @@ func writeWhiteLogo(width: Int, to url: URL) {
 }
 
 let supportURL = URL(fileURLWithPath: projectDir).appendingPathComponent("Support")
-writeWhiteLogo(width: 36, to: supportURL.appendingPathComponent("MenuBarIcon.png"))
 writeWhiteLogo(width: 256, to: supportURL.appendingPathComponent("LogoWhite.png"))
+
+// Icono de barra de menús: arte propio si se pasó (procesado por luminancia
+// para que funcione como template), o la silueta del logo como antes.
+if let menuBarArtPath {
+    guard let artImage = NSImage(contentsOfFile: menuBarArtPath),
+          let artCG = artImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+        print("✗ No se pudo abrir el arte de barra de menús: \(menuBarArtPath)")
+        exit(1)
+    }
+    let processed = whitened(artCG)
+    let width = 36
+    let height = Int(CGFloat(width) * CGFloat(processed.height) / CGFloat(processed.width))
+    let context = CGContext(data: nil, width: width, height: height,
+                            bitsPerComponent: 8, bytesPerRow: width * 4,
+                            space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    context.interpolationQuality = .high
+    context.draw(processed, in: CGRect(x: 0, y: 0, width: width, height: height))
+    let rep = NSBitmapImageRep(cgImage: context.makeImage()!)
+    try! rep.representation(using: .png, properties: [:])!
+        .write(to: supportURL.appendingPathComponent("MenuBarIcon.png"))
+} else {
+    writeWhiteLogo(width: 36, to: supportURL.appendingPathComponent("MenuBarIcon.png"))
+}
 
 let iconutil = Process()
 iconutil.executableURL = URL(fileURLWithPath: "/usr/bin/iconutil")
