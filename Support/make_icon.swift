@@ -1,21 +1,22 @@
-// Genera Support/AppIcon.icns montando el logo de Dicta sobre el cuadrado
-// redondeado negro estilo macOS.
+// Genera los assets de icono de Dicta.
 //
-// El logo se procesa por luminancia: los trazos oscuros se vuelven blancos y
-// las zonas claras se vuelven transparentes (huecos que muestran el fondo).
-// Así funciona igual si el PNG viene oscuro-sobre-transparente u
-// oscuro-sobre-blanco.
+// - AppIcon.icns: si se pasa <arte-dock.png> (tile ya diseñado, p. ej. el
+//   blanco con borde outline del branding), se usa tal cual centrado en la
+//   retícula estándar de macOS. Si no, se monta el logo (procesado por
+//   luminancia) sobre un cuadrado redondeado negro.
+// - MenuBarIcon.png y LogoWhite.png: variantes blancas del logo para la app.
 //
 // Uso: swiftc -sdk <sdk> -o /tmp/make_icon Support/make_icon.swift
-//      /tmp/make_icon <logo.png> <dir-proyecto>
+//      /tmp/make_icon <logo.png> <dir-proyecto> [arte-dock.png]
 import AppKit
 
 guard CommandLine.arguments.count > 2 else {
-    print("uso: make_icon <logo.png> <dir-proyecto>")
+    print("uso: make_icon <logo.png> <dir-proyecto> [arte-dock.png]")
     exit(1)
 }
 let logoPath = CommandLine.arguments[1]
 let projectDir = CommandLine.arguments[2]
+let dockArtPath = CommandLine.arguments.count > 3 ? CommandLine.arguments[3] : nil
 
 guard let logoImage = NSImage(contentsOfFile: logoPath),
       let logoCG = logoImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
@@ -99,6 +100,34 @@ let previewURL = URL(fileURLWithPath: projectDir).appendingPathComponent("build/
 try? FileManager.default.removeItem(at: iconsetURL)
 try! FileManager.default.createDirectory(at: iconsetURL, withIntermediateDirectories: true)
 
+// Arte de dock ya diseñado: usarlo tal cual, centrado en la retícula
+// estándar de macOS (margen ~9.8 % por lado, como todos los íconos).
+func drawFromArt(pixels: Int, art: CGImage) -> NSBitmapImageRep {
+    let s = CGFloat(pixels)
+    let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: pixels, pixelsHigh: pixels,
+                               bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                               colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+    NSGraphicsContext.saveGraphicsState()
+    NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+    let context = NSGraphicsContext.current!.cgContext
+    context.interpolationQuality = .high
+    let margin = s * 0.098
+    context.draw(art, in: CGRect(x: margin, y: margin,
+                                 width: s - margin * 2, height: s - margin * 2))
+    NSGraphicsContext.restoreGraphicsState()
+    return rep
+}
+
+var dockArt: CGImage?
+if let dockArtPath {
+    guard let artImage = NSImage(contentsOfFile: dockArtPath),
+          let artCG = artImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+        print("✗ No se pudo abrir el arte de dock: \(dockArtPath)")
+        exit(1)
+    }
+    dockArt = artCG
+}
+
 let entries: [(name: String, pixels: Int)] = [
     ("icon_16x16", 16), ("icon_16x16@2x", 32),
     ("icon_32x32", 32), ("icon_32x32@2x", 64),
@@ -108,13 +137,15 @@ let entries: [(name: String, pixels: Int)] = [
 ]
 
 for entry in entries {
-    let rep = drawIcon(pixels: entry.pixels)
+    let rep = dockArt.map { drawFromArt(pixels: entry.pixels, art: $0) }
+        ?? drawIcon(pixels: entry.pixels)
     let png = rep.representation(using: .png, properties: [:])!
     try! png.write(to: iconsetURL.appendingPathComponent("\(entry.name).png"))
 }
 
 // Vista previa a 512 para revisión rápida.
-try! drawIcon(pixels: 512).representation(using: .png, properties: [:])!
+let previewRep = dockArt.map { drawFromArt(pixels: 512, art: $0) } ?? drawIcon(pixels: 512)
+try! previewRep.representation(using: .png, properties: [:])!
     .write(to: previewURL)
 
 // Variantes blancas-sobre-transparente del logo para usar dentro de la app:
