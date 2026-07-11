@@ -13,7 +13,7 @@ final class SettingsWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 814),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: BrandWindow.height),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -44,9 +44,7 @@ struct SettingsView: View {
     @State private var launchAtLoginError: String?
 
     var body: some View {
-        VStack(spacing: 0) {
-            BrandHeader(title: "SETTINGS", compact: true)
-
+        BrandScreen(title: "SETTINGS", width: 520) {
             VStack(alignment: .leading, spacing: 14) {
                 section("ACTIVATION") {
                     row("MODE") {
@@ -124,14 +122,8 @@ struct SettingsView: View {
             }
             .padding(.horizontal, 30)
             .padding(.top, 16)
-
-            BrandFooter()
-                .padding(.top, 24)
-                .padding(.bottom, 16)
+            .padding(.bottom, 8)
         }
-        .frame(width: 520, height: 814)
-        .background(Theme.background)
-        .preferredColorScheme(.dark)
     }
 
     // MARK: filas y estados

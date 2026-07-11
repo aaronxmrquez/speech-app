@@ -12,7 +12,7 @@ final class HistoryWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 735),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: BrandWindow.height),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -83,16 +83,15 @@ struct HistoryView: View {
                         }
                     }
                     .padding(.horizontal, 30)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 8)
                 }
-
             }
 
             BrandFooter()
-                .padding(.top, 24)
+                .padding(.top, 16)
                 .padding(.bottom, 16)
         }
-        .frame(width: 520, height: 735)
+        .frame(width: 520, height: BrandWindow.height)
         .background(Theme.background)
         .preferredColorScheme(.dark)
         .environment(\.locale, Locale(identifier: "en_US"))

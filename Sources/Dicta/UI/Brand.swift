@@ -76,7 +76,7 @@ struct BrandHeader: View {
     var compact = false
 
     var body: some View {
-        VStack(spacing: compact ? 12 : 18) {
+        VStack(spacing: compact ? 5 : 8) {
             ZStack {
                 DotPatternView()
                     .frame(height: compact ? 144 : 168)
@@ -284,4 +284,29 @@ struct BrandFooter: View {
 
 enum BrandWindow {
     static let backgroundColor = NSColor(srgbRed: 0.102, green: 0.102, blue: 0.110, alpha: 1)
+    /// Alto único de todas las ventanas (referencia: la pantalla de permisos).
+    static let height: CGFloat = 762
+}
+
+/// Esqueleto compartido de ventana: header (puntos + logo + título) y footer
+/// fijos; el contenido del medio hace scroll si no cabe.
+struct BrandScreen<Content: View>: View {
+    let title: String
+    let width: CGFloat
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        VStack(spacing: 0) {
+            BrandHeader(title: title)
+            ScrollView(showsIndicators: false) {
+                content()
+            }
+            BrandFooter()
+                .padding(.top, 16)
+                .padding(.bottom, 16)
+        }
+        .frame(width: width, height: BrandWindow.height)
+        .background(Theme.background)
+        .preferredColorScheme(.dark)
+    }
 }
