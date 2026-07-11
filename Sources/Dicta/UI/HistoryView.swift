@@ -12,7 +12,7 @@ final class HistoryWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 720),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 735),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -88,11 +88,11 @@ struct HistoryView: View {
 
             }
 
-            BrandFooter(text: "Dicta is an app created by Aaron Márquez.")
+            BrandFooter()
                 .padding(.top, 24)
                 .padding(.bottom, 16)
         }
-        .frame(width: 520, height: 720)
+        .frame(width: 520, height: 735)
         .background(Theme.background)
         .preferredColorScheme(.dark)
         .environment(\.locale, Locale(identifier: "en_US"))

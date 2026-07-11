@@ -16,7 +16,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 760),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 762),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -97,7 +97,9 @@ struct OnboardingView: View {
             .padding(.top, 24)
 
             HStack(alignment: .bottom, spacing: 16) {
-                VStack(alignment: .leading, spacing: 3) {
+                // Space Mono trae mucho aire interno: el spacing negativo
+                // compensa para el leading apretado de la referencia.
+                VStack(alignment: .leading, spacing: -6) {
                     Text("BECAUSE WE KNOW")
                         .foregroundStyle(Theme.tertiary)
                     Text("YOU HATE TYPING.")
@@ -115,21 +117,13 @@ struct OnboardingView: View {
             .padding(.horizontal, 30)
             .padding(.top, 60) // gap fijo entre las cards y el bloque final
 
-            BrandFooter(text: footerText)
+            BrandFooter()
                 .padding(.top, 24)
                 .padding(.bottom, 16)
         }
-        .frame(width: 560, height: 760)
+        .frame(width: 560, height: 762)
         .background(Theme.background)
         .preferredColorScheme(.dark)
-    }
-
-    private var footerText: String {
-        if permissions.allGranted {
-            let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
-            return "Dicta \(version) — Just speak and the text appears wherever your cursor is."
-        }
-        return "Dicta is an app created by Aaron Márquez."
     }
 }
 

@@ -13,7 +13,7 @@ final class SettingsWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 800),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 814),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -125,11 +125,11 @@ struct SettingsView: View {
             .padding(.horizontal, 30)
             .padding(.top, 16)
 
-            BrandFooter(text: "Dicta is an app created by Aaron Márquez.")
+            BrandFooter()
                 .padding(.top, 24)
                 .padding(.bottom, 16)
         }
-        .frame(width: 520, height: 800)
+        .frame(width: 520, height: 814)
         .background(Theme.background)
         .preferredColorScheme(.dark)
     }

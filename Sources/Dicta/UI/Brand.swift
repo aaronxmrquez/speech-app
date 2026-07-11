@@ -264,14 +264,21 @@ struct PrimaryButton: View {
     }
 }
 
+/// Footer unificado de las tres ventanas: tagline con versión + crédito.
 struct BrandFooter: View {
-    let text: String
-
     var body: some View {
-        Text(text)
-            .font(Theme.sans(11))
-            .foregroundStyle(Theme.tertiary)
-            .frame(maxWidth: .infinity)
+        VStack(spacing: 3) {
+            Text("Dicta \(Self.version) — Just speak and the text appears wherever your cursor is.")
+            Text("An app created by Aaron Márquez.")
+        }
+        .font(Theme.sans(11))
+        .foregroundStyle(Theme.tertiary)
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+    }
+
+    private static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
     }
 }
 
