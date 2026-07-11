@@ -63,7 +63,7 @@ struct OnboardingView: View {
     var onReady: () -> Void
 
     var body: some View {
-        BrandScreen(title: "SET UP", width: 560) {
+        BrandScreen(title: "SET UP") {
             VStack(spacing: 14) {
                 PermissionCard(
                     icon: "mic",

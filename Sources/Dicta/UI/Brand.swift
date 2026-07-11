@@ -76,7 +76,9 @@ struct BrandHeader: View {
     var compact = false
 
     var body: some View {
-        VStack(spacing: compact ? 5 : 8) {
+        // El logo va empujado hacia el borde inferior de la banda de puntos y
+        // el spacing es negativo: el gap visual logo→título queda en ~16 pt.
+        VStack(spacing: -4) {
             ZStack {
                 DotPatternView()
                     .frame(height: compact ? 144 : 168)
@@ -85,7 +87,7 @@ struct BrandHeader: View {
                                        startPoint: .top, endPoint: .bottom)
                     )
                 LogoTileView(size: compact ? 64 : 72)
-                    .offset(y: compact ? 10 : 14)
+                    .offset(y: compact ? 24 : 28)
             }
             Text(title)
                 .font(Theme.mono(compact ? 22 : 24, .medium))
@@ -292,7 +294,7 @@ enum BrandWindow {
 /// fijos; el contenido del medio hace scroll si no cabe.
 struct BrandScreen<Content: View>: View {
     let title: String
-    let width: CGFloat
+    var width: CGFloat = 560 // referencia: la ventana de permisos
     @ViewBuilder var content: () -> Content
 
     var body: some View {
@@ -301,6 +303,9 @@ struct BrandScreen<Content: View>: View {
             ScrollView(showsIndicators: false) {
                 content()
             }
+            // Si el contenido cabe (como en permisos), no hay scroll;
+            // si no cabe, el usuario puede scrollear.
+            .scrollBounceBehavior(.basedOnSize, axes: .vertical)
             BrandFooter()
                 .padding(.top, 16)
                 .padding(.bottom, 16)

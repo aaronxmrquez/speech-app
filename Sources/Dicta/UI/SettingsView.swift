@@ -13,7 +13,7 @@ final class SettingsWindowController {
 
     func show() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: BrandWindow.height),
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: BrandWindow.height),
                              styleMask: [.titled, .closable, .fullSizeContentView],
                              backing: .buffered,
                              defer: false)
@@ -44,7 +44,7 @@ struct SettingsView: View {
     @State private var launchAtLoginError: String?
 
     var body: some View {
-        BrandScreen(title: "SETTINGS", width: 520) {
+        BrandScreen(title: "SETTINGS") {
             VStack(alignment: .leading, spacing: 14) {
                 section("ACTIVATION") {
                     row("MODE") {
