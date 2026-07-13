@@ -1,77 +1,62 @@
 # Dicta
 
 Dictado por voz para macOS. Vive en la barra de menús: mantienes presionada
-**⌘ derecha**, hablas, la sueltas — y el texto se escribe donde esté tu cursor,
-en cualquier app (Slack, correo, navegador, editores). Diseño monocromo
-negro/blanco.
+una tecla, hablas, la sueltas — y el texto se escribe donde esté tu cursor,
+en cualquier app (Slack, correo, navegador, editores).
+
+**Descarga:** https://github.com/aaronxmrquez/speech-app/releases/latest/download/Dicta.dmg
+
+Requisitos: Mac con Apple Silicon (M1+) y macOS 14+. La app no está
+notarizada: la primera apertura pide "Abrir de todos modos" en Ajustes del
+Sistema → Privacidad y seguridad.
 
 ## Uso
 
-- **Mantener tecla** (por defecto): mantén ⌘ derecha y habla; al soltarla se
-  inserta el texto. **Esc** cancela. Presionar cualquier otra tecla mientras
-  mantienes también cancela (los atajos como ⌘C siguen funcionando).
-- **Alternar**: ⌥ Espacio inicia y detiene (elegible en Ajustes).
-- Idiomas: Auto (detección) / Español / English, cambiables desde el menú.
+- **Mantener tecla** (por defecto ⌘ derecha; cambiable a ⌥ derecha o fn):
+  mantén, habla, suelta. **Esc** cancela. Los atajos normales (⌘C…) siguen
+  funcionando mientras dictas.
+- **Alternar**: ⌥ Espacio inicia/detiene (elegible en Settings).
+- **Idioma**: Auto (detección automática es/en con Whisper), Español o English.
+- **History**: los últimos 100 dictados, clic para copiar. Local siempre.
+- La UI de la app está en inglés; branding: carbón + Space Mono + Inter con
+  acento verde, splash de bienvenida en la primera instalación.
 
-## Motores (v2)
+## Motores
 
-- **Whisper (por defecto)**: whisper.cpp con Metal, modelo large-v3-turbo
-  cuantizado (~574 MB, se descarga desde Ajustes la primera vez). Máxima
-  precisión en español e inglés (incluso con acento) y detección automática
-  de idioma. 100 % local. Híbrido: mientras hablas ves parciales en vivo del
-  motor de Apple y al soltar se inserta el resultado de Whisper (~1 s).
-  Mantiene el modelo en RAM (~800 MB) mientras la app corre.
-- **Apple**: SFSpeechRecognizer. Más liviano, parciales en vivo, sin descargas.
-
-## Historial (v3)
-
-Menú → **Historial…**: los últimos 100 dictados (texto, fecha y app destino),
-guardados localmente en `~/Library/Application Support/Dicta/history.json`.
-Clic en uno para copiarlo. Se desactiva en Ajustes → "Guardar historial".
-
-## Firma estable (v3)
-
-`Support/make_signing_cert.sh` crea un certificado local autofirmado
-("Dicta Local Signing", solo para firma de código) y `build.sh` lo usa
-automáticamente si existe: la identidad de la app deja de cambiar entre
-builds y el permiso de Accesibilidad se concede una sola vez. Sin el
-certificado, `build.sh` cae a firma ad-hoc (y resetea Accesibilidad al
-instalar para evitar el "switch fantasma").
-
-Necesita tres permisos (el onboarding los guía): Micrófono, Reconocimiento de
-voz y Accesibilidad.
+- **Whisper (por defecto)**: whisper.cpp + Metal, modelo large-v3-turbo
+  cuantizado (574 MB, se descarga desde Settings una sola vez). Máxima
+  precisión en español e inglés, 100 % local. Híbrido: parciales en vivo con
+  el motor de Apple, texto final de Whisper (~1 s).
+- **Apple**: SFSpeechRecognizer. Sin descargas, más liviano.
 
 ## Build
 
 ```sh
 ./build.sh release            # compila y ensambla build/Dicta.app
 ./build.sh release install    # además instala en /Applications
+./build.sh release dmg        # genera build/Dicta.dmg distribuible
 ```
 
-Compila con `swiftc` directamente contra el SDK de macOS 15.5 (el SwiftPM de
-los Command Line Tools de esta máquina está roto por una actualización parcial
-— ver nota en build.sh). Firma ad-hoc: al recompilar, macOS puede pedir
-re-conceder Accesibilidad.
+Notas de esta máquina: compila con `swiftc` directo contra el SDK de macOS
+15.5 (el SwiftPM de los CLT está roto — ver comentario en `build.sh`).
+whisper.cpp se clona y compila solo en `vendor/` la primera vez. La firma usa
+el certificado local "Dicta Local Signing" si existe
+(`Support/make_signing_cert.sh`); sin él cae a ad-hoc.
 
-El ícono se regenera con:
-
-```sh
-swiftc -sdk /Library/Developer/CommandLineTools/SDKs/MacOSX15.5.sdk \
-  -o /tmp/make_icon Support/make_icon.swift && /tmp/make_icon .
-```
+Assets de marca en `Support/`: logo, ícono de app y de barra de menús
+(`make_icon.swift` los regenera), patrón del splash (SVG de Figma) y fuentes
+Space Mono/Inter embebidas (OFL).
 
 ## Arquitectura
 
-`HotkeyMonitor` (CGEventTap) → `AppState` (máquina de estados: idle → grabando
-→ transcribiendo → insertando) → `AudioRecorder` (AVAudioEngine) alimenta a
-`AppleSpeechEngine` (SFSpeechRecognizer, parciales en streaming) → HUD flotante
-(`NSPanel` no activante) muestra waveform y texto en vivo → `TextInserter`
-escribe el resultado (portapapeles + ⌘V sintético + restauración del
-portapapeles original).
+`HotkeyMonitor` (CGEventTap) → `AppState` (idle → grabando → transcribiendo →
+insertando) → `AudioRecorder` (AVAudioEngine) alimenta al motor activo →
+HUD flotante (`NSPanel` no activante) con parciales en vivo → `TextInserter`
+(portapapeles + ⌘V sintético + restauración).
 
-El motor de voz está detrás del protocolo `TranscriptionEngine`
-(Sources/Dicta/Transcription/TranscriptionEngine.swift): para agregar Whisper
-local o una API en la nube solo hay que implementar ese protocolo.
+Los motores implementan el protocolo `TranscriptionEngine`
+(Sources/Dicta/Transcription/): agregar uno nuevo no toca el resto.
 
-Modo de desarrollo: `Dicta --render-previews <dir>` renderiza las vistas
-principales a PNG sin necesidad de permisos de grabación de pantalla.
+Modos de desarrollo: `--render-previews <dir>` (renderiza las vistas a PNG),
+`--transcribe-file <audio> [es|en|auto]` (prueba el motor sin micrófono),
+`--splash` (muestra el splash de bienvenida).
