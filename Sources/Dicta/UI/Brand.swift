@@ -97,7 +97,7 @@ struct VersionTag: View {
         Text("DICTA \(Self.version)")
             .font(Theme.sans(10))
             .tracking(0.5)
-            .foregroundStyle(Theme.dictaGray)
+            .foregroundStyle(Theme.footerGray)
     }
 
     private static var version: String {
@@ -310,7 +310,7 @@ struct BrandFooter: View {
             }
         }
         .font(Theme.sans(11.5))
-        .foregroundStyle(Theme.tertiary)
+        .foregroundStyle(Theme.footerGray)
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
     }
@@ -339,8 +339,8 @@ struct BrandScreen<Content: View>: View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 0) {
                 BrandHeader(section: section)
-                    .padding(.top, 65)
-                    .padding(.bottom, 30)
+                    .padding(.top, 110) // 173px en Figma (factor 0.6335)
+                    .padding(.bottom, 14)
                 ScrollView(showsIndicators: false) {
                     content()
                 }

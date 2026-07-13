@@ -58,8 +58,8 @@ struct HistoryView: View {
     private var historyBody: some View {
         VStack(spacing: 0) {
             BrandHeader(section: "HISTORY")
-                .padding(.top, 65)
-                .padding(.bottom, 30)
+                .padding(.top, 110) // 173px en Figma (factor 0.6335)
+                .padding(.bottom, 14)
 
             if history.records.isEmpty {
                 Spacer()

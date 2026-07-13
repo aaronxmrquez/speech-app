@@ -111,7 +111,7 @@ struct SplashView: View {
                         }
                 }
                 .font(Theme.sans(11.5))
-                .foregroundStyle(Theme.tertiary)
+                .foregroundStyle(Theme.footerGray)
                 .padding(.bottom, 30)
             }
             .frame(maxWidth: .infinity)

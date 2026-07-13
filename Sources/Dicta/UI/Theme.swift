@@ -14,8 +14,10 @@ enum Theme {
     static let secondary = Color.white.opacity(0.55)
     static let tertiary = Color.white.opacity(0.32)
     static let accent = Color(red: 0.22, green: 0.84, blue: 0.06) // verde #38D610
-    /// Gris exacto del "DICTA." en títulos y del tag de versión (#5D5B5B).
+    /// Gris exacto del "DICTA." en títulos (#5D5B5B).
     static let dictaGray = Color(red: 0.365, green: 0.357, blue: 0.357)
+    /// Gris exacto del footer y el tag de versión (#545454).
+    static let footerGray = Color(red: 0.329, green: 0.329, blue: 0.329)
 
     // Tipografía: Space Mono (embebida en Resources/Fonts) para titulares,
     // labels y controles; sans del sistema para descripciones.
