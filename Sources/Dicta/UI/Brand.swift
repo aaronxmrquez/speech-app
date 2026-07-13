@@ -82,7 +82,7 @@ struct BrandHeader: View {
         VStack(spacing: 15) {
             LogoTileView()
             (Text("DICTA.")
-                .foregroundColor(Theme.secondary)
+                .foregroundColor(Theme.dictaGray)
              + Text(section)
                 .foregroundColor(Theme.primary))
                 .font(Theme.mono(28, .regular))
@@ -95,9 +95,9 @@ struct BrandHeader: View {
 struct VersionTag: View {
     var body: some View {
         Text("DICTA \(Self.version)")
-            .font(Theme.mono(10, .medium))
-            .tracking(1.5)
-            .foregroundStyle(Theme.tertiary)
+            .font(Theme.sans(10))
+            .tracking(0.5)
+            .foregroundStyle(Theme.dictaGray)
     }
 
     private static var version: String {

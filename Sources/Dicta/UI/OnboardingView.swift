@@ -102,7 +102,7 @@ struct OnboardingView: View {
                           action: onReady)
                 .frame(width: 290)
                 .frame(maxWidth: .infinity)
-                .padding(.top, 46)
+                .padding(.top, 28)
         }
     }
 }

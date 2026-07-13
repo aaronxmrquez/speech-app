@@ -50,10 +50,23 @@ struct SplashView: View {
             VStack(spacing: 0) {
                 Spacer(minLength: 40)
 
-                // Halo de puntos animado con el logo al centro.
+                // Patrón de puntos exacto de Figma (SVG vectorial) con una
+                // respiración sutil; el logo al centro.
                 ZStack {
-                    DotPatternView()
-                        .frame(width: 423, height: 158)
+                    if let url = Bundle.main.url(forResource: "SplashPattern", withExtension: "svg"),
+                       let pattern = NSImage(contentsOf: url) {
+                        TimelineView(.animation(minimumInterval: 1.0 / 20.0)) { timeline in
+                            let time = timeline.date.timeIntervalSinceReferenceDate
+                            Image(nsImage: pattern)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 423)
+                                .opacity(0.78 + 0.22 * sin(time * 1.1))
+                        }
+                    } else {
+                        DotPatternView()
+                            .frame(width: 423, height: 158)
+                    }
                     LogoTileView()
                 }
 
