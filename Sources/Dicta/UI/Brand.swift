@@ -54,7 +54,7 @@ struct DotPatternView: View {
 
 /// Tile blanco redondeado con el logo (la cara) en negro, como en el branding.
 struct LogoTileView: View {
-    var size: CGFloat = 72
+    var size: CGFloat = 80
 
     var body: some View {
         ZStack {

@@ -96,12 +96,13 @@ struct OnboardingView: View {
             .padding(.top, 24)
 
             // El statement se mudó al splash: aquí va el botón de cierre
-            // del set up, ancho completo como en el diseño.
+            // del set up, con el ancho fijo del diseño.
             PrimaryButton(label: "ALL SET! START SPEAKING",
                           enabled: permissions.allGranted,
                           fullWidth: true,
                           action: onReady)
-                .padding(.horizontal, 30)
+                .frame(width: 458)
+                .frame(maxWidth: .infinity)
                 .padding(.top, 48)
         }
     }
