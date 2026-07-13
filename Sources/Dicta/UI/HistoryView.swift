@@ -45,7 +45,7 @@ struct HistoryView: View {
         ZStack(alignment: .topTrailing) {
             historyBody
             VersionTag()
-                .padding(.top, 18)
+                .padding(.top, 14)
                 .padding(.trailing, 20)
         }
         .frame(width: 560, height: BrandWindow.height)

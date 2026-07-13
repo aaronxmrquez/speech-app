@@ -54,7 +54,7 @@ struct DotPatternView: View {
 
 /// Tile blanco redondeado con el logo (la cara) en negro, como en el branding.
 struct LogoTileView: View {
-    var size: CGFloat = 80
+    var size: CGFloat = 68
 
     var body: some View {
         ZStack {
@@ -264,7 +264,7 @@ struct PrimaryButton: View {
                 .foregroundStyle(enabled ? Color.black : Theme.tertiary)
                 .padding(.horizontal, 30)
                 .frame(maxWidth: fullWidth ? .infinity : nil)
-                .frame(height: 54)
+                .frame(height: 48)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(enabled ? Color.white : Color.clear)
@@ -343,7 +343,7 @@ struct BrandScreen<Content: View>: View {
                     .padding(.bottom, 16)
             }
             VersionTag()
-                .padding(.top, 18)
+                .padding(.top, 14)
                 .padding(.trailing, 20)
         }
         .frame(width: width, height: BrandWindow.height)

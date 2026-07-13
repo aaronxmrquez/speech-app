@@ -104,7 +104,7 @@ struct SplashView: View {
             .frame(maxWidth: .infinity)
 
             VersionTag()
-                .padding(.top, 18)
+                .padding(.top, 14)
                 .padding(.trailing, 20)
         }
         .frame(width: 560, height: BrandWindow.height)
