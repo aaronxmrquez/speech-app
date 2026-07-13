@@ -3,8 +3,9 @@ import AppKit
 
 // Componentes compartidos del branding de Dicta.
 
-/// Patrón de puntos tipo halftone, animado: una onda lenta de brillo que
-/// emana del centro (donde vive el logo) con un titileo orgánico por punto.
+/// Patrón de puntos tipo halftone, animado: halo elíptico alrededor del
+/// centro (donde vive el logo del splash) con una onda lenta de brillo y
+/// titileo orgánico por punto.
 struct DotPatternView: View {
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 24.0)) { timeline in
@@ -12,7 +13,9 @@ struct DotPatternView: View {
             Canvas { context, size in
                 let spacing: CGFloat = 14
                 let dotRadius: CGFloat = 1.1
-                let center = CGPoint(x: size.width / 2, y: size.height * 0.48)
+                let center = CGPoint(x: size.width / 2, y: size.height / 2)
+                let radiusX = size.width * 0.46
+                let radiusY = size.height * 0.52
 
                 let columns = Int(size.width / spacing) + 1
                 let rows = Int(size.height / spacing) + 1
@@ -21,11 +24,12 @@ struct DotPatternView: View {
                         let x = CGFloat(column) * spacing + spacing / 2
                         let y = CGFloat(row) * spacing + spacing / 2
 
-                        // El brillo cae solo hacia los costados: las filas de
-                        // arriba llegan nítidas al borde superior de la ventana
-                        // (el degradado inferior lo pone la máscara del header).
-                        let dxNorm = abs(x - center.x) / (size.width * 0.62)
-                        let falloff = max(0, 1 - dxNorm * dxNorm)
+                        // Halo elíptico: brillo máximo cerca del logo, cae
+                        // suave hacia el borde de la elipse.
+                        let dx = (x - center.x) / radiusX
+                        let dy = (y - center.y) / radiusY
+                        let elliptic = dx * dx + dy * dy
+                        let falloff = max(0, 1 - elliptic)
 
                         // titileo determinista por punto + onda radial lenta
                         let distance = hypot(x - center.x, y - center.y)
@@ -34,7 +38,7 @@ struct DotPatternView: View {
                         let wave = sin(time * 1.6 - Double(distance) * 0.045 + phase * .pi * 2)
                         let twinkle = 0.55 + 0.45 * wave
 
-                        let opacity = Double(falloff * sqrt(falloff)) * twinkle * 0.5 + 0.03
+                        let opacity = Double(falloff * falloff) * twinkle * 0.55
                         guard opacity > 0.04 else { continue }
 
                         let rect = CGRect(x: x - dotRadius, y: y - dotRadius,
@@ -69,31 +73,35 @@ struct LogoTileView: View {
     }
 }
 
-/// Cabecera compartida: puntos animados + tile del logo + título mono.
-/// `compact` reduce las alturas para ventanas con mucho contenido (Settings).
+/// Cabecera compartida: tile del logo + título dos-tonos "DICTA.SECCIÓN"
+/// (la marca en gris, la sección donde estás en blanco puro).
 struct BrandHeader: View {
-    let title: String
-    var compact = false
+    let section: String
 
     var body: some View {
-        // El logo va empujado hacia el borde inferior de la banda de puntos y
-        // el spacing es negativo: el gap visual logo→título queda en ~16 pt.
-        VStack(spacing: -4) {
-            ZStack {
-                DotPatternView()
-                    .frame(height: compact ? 144 : 168)
-                    .mask(
-                        LinearGradient(colors: [.black, .black, .clear],
-                                       startPoint: .top, endPoint: .bottom)
-                    )
-                LogoTileView(size: compact ? 64 : 72)
-                    .offset(y: compact ? 24 : 28)
-            }
-            Text(title)
-                .font(Theme.mono(compact ? 22 : 24, .medium))
-                .tracking(7)
-                .foregroundStyle(Theme.primary)
+        VStack(spacing: 20) {
+            LogoTileView()
+            (Text("DICTA.")
+                .foregroundColor(Theme.secondary)
+             + Text(section)
+                .foregroundColor(Theme.primary))
+                .font(Theme.mono(24, .medium))
+                .tracking(1)
         }
+    }
+}
+
+/// Nombre de la app + versión, esquina superior derecha de cada ventana.
+struct VersionTag: View {
+    var body: some View {
+        Text("DICTA \(Self.version)")
+            .font(Theme.mono(10, .medium))
+            .tracking(1.5)
+            .foregroundStyle(Theme.tertiary)
+    }
+
+    private static var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
     }
 }
 
@@ -241,10 +249,11 @@ struct StatusCircle: View {
     }
 }
 
-/// Botón principal: blanco cuando está habilitado.
+/// Botón principal: blanco al habilitarse; deshabilitado = contorno tenue.
 struct PrimaryButton: View {
     let label: String
     let enabled: Bool
+    var fullWidth = false
     let action: () -> Void
 
     var body: some View {
@@ -254,10 +263,15 @@ struct PrimaryButton: View {
                 .tracking(2.5)
                 .foregroundStyle(enabled ? Color.black : Theme.tertiary)
                 .padding(.horizontal, 30)
+                .frame(maxWidth: fullWidth ? .infinity : nil)
                 .frame(height: 54)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(enabled ? Color.white : Color.white.opacity(0.06))
+                        .fill(enabled ? Color.white : Color.clear)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(enabled ? Color.clear : Color.white.opacity(0.14), lineWidth: 1)
                 )
         }
         .buttonStyle(.plain)
@@ -266,21 +280,30 @@ struct PrimaryButton: View {
     }
 }
 
-/// Footer unificado de las tres ventanas: tagline con versión + crédito.
+/// Footer unificado: tagline + crédito. El nombre lleva subrayado y abre
+/// aaronxmarquez.com — mismo color que el resto del texto, solo subrayado.
 struct BrandFooter: View {
     var body: some View {
         VStack(spacing: 3) {
-            Text("Dicta \(Self.version) — Just speak and the text appears wherever your cursor is.")
-            Text("An app created by Aaron Márquez.")
+            Text("Just speak and the text will be written wherever your cursor is.")
+            HStack(spacing: 4) {
+                Text("An app created by")
+                Text("Aaron Márquez")
+                    .underline()
+                    .onHover { hovering in
+                        if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                    }
+                    .onTapGesture {
+                        if let url = URL(string: "https://www.aaronxmarquez.com/") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }
+            }
         }
         .font(Theme.sans(11))
         .foregroundStyle(Theme.tertiary)
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
-    }
-
-    private static var version: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
     }
 }
 
@@ -288,27 +311,40 @@ enum BrandWindow {
     static let backgroundColor = NSColor(srgbRed: 0.102, green: 0.102, blue: 0.110, alpha: 1)
     /// Alto único de todas las ventanas (referencia: la pantalla de permisos).
     static let height: CGFloat = 762
+
+    /// Chrome de marca: solo el botón rojo de cerrar, como en el diseño.
+    static func applyChrome(to window: NSWindow) {
+        window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        window.standardWindowButton(.zoomButton)?.isHidden = true
+    }
 }
 
-/// Esqueleto compartido de ventana: header (puntos + logo + título) y footer
-/// fijos; el contenido del medio hace scroll si no cabe.
+/// Esqueleto compartido de ventana: versión arriba a la derecha, header
+/// (logo + título dos-tonos) y footer fijos; el contenido hace scroll si no cabe.
 struct BrandScreen<Content: View>: View {
-    let title: String
+    let section: String
     var width: CGFloat = 560 // referencia: la ventana de permisos
     @ViewBuilder var content: () -> Content
 
     var body: some View {
-        VStack(spacing: 0) {
-            BrandHeader(title: title)
-            ScrollView(showsIndicators: false) {
-                content()
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                BrandHeader(section: section)
+                    .padding(.top, 56)
+                    .padding(.bottom, 8)
+                ScrollView(showsIndicators: false) {
+                    content()
+                }
+                // Si el contenido cabe (como en permisos), no hay scroll;
+                // si no cabe, el usuario puede scrollear.
+                .scrollBounceBehavior(.basedOnSize, axes: .vertical)
+                BrandFooter()
+                    .padding(.top, 16)
+                    .padding(.bottom, 16)
             }
-            // Si el contenido cabe (como en permisos), no hay scroll;
-            // si no cabe, el usuario puede scrollear.
-            .scrollBounceBehavior(.basedOnSize, axes: .vertical)
-            BrandFooter()
-                .padding(.top, 16)
-                .padding(.bottom, 16)
+            VersionTag()
+                .padding(.top, 18)
+                .padding(.trailing, 20)
         }
         .frame(width: width, height: BrandWindow.height)
         .background(Theme.background)

@@ -23,6 +23,7 @@ final class HistoryWindowController {
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
+            BrandWindow.applyChrome(to: w)
             w.contentView = NSHostingView(rootView: HistoryView(history: history))
             w.center()
             window = w
@@ -41,8 +42,23 @@ struct HistoryView: View {
     @State private var copiedId: UUID?
 
     var body: some View {
+        ZStack(alignment: .topTrailing) {
+            historyBody
+            VersionTag()
+                .padding(.top, 18)
+                .padding(.trailing, 20)
+        }
+        .frame(width: 560, height: BrandWindow.height)
+        .background(Theme.background)
+        .preferredColorScheme(.dark)
+        .environment(\.locale, Locale(identifier: "en_US"))
+    }
+
+    private var historyBody: some View {
         VStack(spacing: 0) {
-            BrandHeader(title: "HISTORY")
+            BrandHeader(section: "HISTORY")
+                .padding(.top, 56)
+                .padding(.bottom, 8)
 
             if history.records.isEmpty {
                 Spacer()
@@ -92,10 +108,6 @@ struct HistoryView: View {
                 .padding(.top, 16)
                 .padding(.bottom, 16)
         }
-        .frame(width: 560, height: BrandWindow.height)
-        .background(Theme.background)
-        .preferredColorScheme(.dark)
-        .environment(\.locale, Locale(identifier: "en_US"))
     }
 
     private func copy(_ record: DictationRecord) {

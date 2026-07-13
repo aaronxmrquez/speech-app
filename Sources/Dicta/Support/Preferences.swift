@@ -79,6 +79,9 @@ final class Preferences: ObservableObject {
     @Published var hasCompletedOnboarding: Bool {
         didSet { defaults.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding") }
     }
+    @Published var hasSeenSplash: Bool {
+        didSet { defaults.set(hasSeenSplash, forKey: "hasSeenSplash") }
+    }
 
     var language: DictationLanguage { DictationLanguage.by(id: languageId) }
 
@@ -90,5 +93,6 @@ final class Preferences: ObservableObject {
         playSounds = defaults.object(forKey: "playSounds") == nil ? true : defaults.bool(forKey: "playSounds")
         saveHistory = defaults.object(forKey: "saveHistory") == nil ? true : defaults.bool(forKey: "saveHistory")
         hasCompletedOnboarding = defaults.bool(forKey: "hasCompletedOnboarding")
+        hasSeenSplash = defaults.bool(forKey: "hasSeenSplash")
     }
 }

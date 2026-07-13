@@ -22,6 +22,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var settingsWindow: SettingsWindowController?
     private var onboardingWindow: OnboardingWindowController?
     private var historyWindow: HistoryWindowController?
+    private var splashWindow: SplashWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if PreviewRenderer.runIfRequested(prefs: prefs, permissions: permissions) {
@@ -50,9 +51,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menuBar = MenuBarController(state: appState, delegate: self)
         appState.start()
 
-        if !(permissions.allGranted && prefs.hasCompletedOnboarding) {
+        // Splash de bienvenida: solo en la primera instalación (o con el
+        // flag de desarrollo --splash para revisarlo).
+        if CommandLine.arguments.contains("--splash")
+            || (!prefs.hasSeenSplash && !prefs.hasCompletedOnboarding) {
+            showSplash()
+        } else if !(permissions.allGranted && prefs.hasCompletedOnboarding) {
             showOnboarding()
         }
+    }
+
+    func showSplash() {
+        if splashWindow == nil {
+            splashWindow = SplashWindowController { [weak self] in
+                guard let self else { return }
+                self.prefs.hasSeenSplash = true
+                self.splashWindow?.close()
+                self.showOnboarding()
+            }
+        }
+        closeOtherWindows(keeping: splashWindow)
+        splashWindow?.show()
     }
 
     // Doble clic sobre la app en Finder/Launchpad cuando ya está corriendo:
@@ -71,6 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if settingsWindow !== keep { settingsWindow?.close() }
         if historyWindow !== keep { historyWindow?.close() }
         if onboardingWindow !== keep { onboardingWindow?.close() }
+        if splashWindow !== keep { splashWindow?.close() }
     }
 
     func showOnboarding() {

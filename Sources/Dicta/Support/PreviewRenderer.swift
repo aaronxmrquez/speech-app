@@ -12,20 +12,25 @@ enum PreviewRenderer {
         let dir = URL(fileURLWithPath: CommandLine.arguments[flagIndex + 1], isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
-        // Onboarding con permisos mixtos, para ver ambos estados de fila.
-        permissions.microphone = true
-        render(OnboardingView(permissions: permissions, onReady: {}),
+        render(SplashView(onBegin: {}),
                size: CGSize(width: 560, height: 762),
-               to: dir.appendingPathComponent("onboarding.png"))
+               to: dir.appendingPathComponent("splash.png"))
+
+        // Onboarding con permisos mixtos, para ver ambos estados de fila.
+        // renderInWindow: ImageRenderer no dibuja el contenido de ScrollView.
+        permissions.microphone = true
+        renderInWindow(OnboardingView(permissions: permissions, onReady: {}),
+                       size: CGSize(width: 560, height: 762),
+                       to: dir.appendingPathComponent("onboarding.png"))
 
         // Estado "activo": todos los permisos concedidos.
         let grantedPermissions = Permissions()
         grantedPermissions.microphone = true
         grantedPermissions.speechRecognition = true
         grantedPermissions.accessibility = true
-        render(OnboardingView(permissions: grantedPermissions, onReady: {}),
-               size: CGSize(width: 560, height: 762),
-               to: dir.appendingPathComponent("onboarding-active.png"))
+        renderInWindow(OnboardingView(permissions: grantedPermissions, onReady: {}),
+                       size: CGSize(width: 560, height: 762),
+                       to: dir.appendingPathComponent("onboarding-active.png"))
 
         let state = AppState(prefs: prefs, permissions: permissions, history: HistoryStore.preview())
         state.applyPreview(phase: .recording,

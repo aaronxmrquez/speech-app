@@ -24,6 +24,7 @@ final class SettingsWindowController {
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
+            BrandWindow.applyChrome(to: w)
             w.contentView = NSHostingView(rootView: SettingsView(prefs: prefs))
             w.center()
             window = w
@@ -44,7 +45,7 @@ struct SettingsView: View {
     @State private var launchAtLoginError: String?
 
     var body: some View {
-        BrandScreen(title: "SETTINGS") {
+        BrandScreen(section: "SETTINGS") {
             VStack(alignment: .leading, spacing: 14) {
                 section("ACTIVATION") {
                     row("MODE") {

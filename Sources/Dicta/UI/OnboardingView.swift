@@ -28,6 +28,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
             w.delegate = self
+            BrandWindow.applyChrome(to: w)
             w.contentView = NSHostingView(rootView: OnboardingView(permissions: permissions) { [weak self] in
                 self?.finish()
             })
@@ -63,7 +64,7 @@ struct OnboardingView: View {
     var onReady: () -> Void
 
     var body: some View {
-        BrandScreen(title: "SET UP") {
+        BrandScreen(section: "PERMISSIONS") {
             VStack(spacing: 14) {
                 PermissionCard(
                     icon: "mic",
@@ -94,26 +95,14 @@ struct OnboardingView: View {
             .padding(.horizontal, 30)
             .padding(.top, 24)
 
-            HStack(alignment: .bottom, spacing: 16) {
-                // Space Mono trae mucho aire interno: el spacing negativo
-                // compensa para el leading apretado de la referencia.
-                VStack(alignment: .leading, spacing: -6) {
-                    Text("BECAUSE WE KNOW")
-                        .foregroundStyle(Theme.tertiary)
-                    Text("YOU HATE TYPING.")
-                        .foregroundStyle(Theme.tertiary)
-                    Text("USE DICTA.")
-                        .foregroundStyle(Theme.primary)
-                }
-                .font(Theme.mono(24, .medium))
-                .tracking(2)
-
-                Spacer()
-
-                PrimaryButton(label: "LET'S START", enabled: permissions.allGranted, action: onReady)
-            }
-            .padding(.horizontal, 30)
-            .padding(.top, 60) // gap fijo entre las cards y el bloque final
+            // El statement se mudó al splash: aquí va el botón de cierre
+            // del set up, ancho completo como en el diseño.
+            PrimaryButton(label: "ALL SET! START SPEAKING",
+                          enabled: permissions.allGranted,
+                          fullWidth: true,
+                          action: onReady)
+                .padding(.horizontal, 30)
+                .padding(.top, 48)
         }
     }
 }
