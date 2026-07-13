@@ -52,6 +52,7 @@ struct HistoryView: View {
         .background(Theme.background)
         .preferredColorScheme(.dark)
         .environment(\.locale, Locale(identifier: "en_US"))
+        .ignoresSafeArea()
     }
 
     private var historyBody: some View {

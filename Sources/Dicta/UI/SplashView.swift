@@ -110,5 +110,6 @@ struct SplashView: View {
         .frame(width: 560, height: BrandWindow.height)
         .background(Theme.background)
         .preferredColorScheme(.dark)
+        .ignoresSafeArea()
     }
 }

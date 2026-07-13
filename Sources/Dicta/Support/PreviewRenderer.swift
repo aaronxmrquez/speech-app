@@ -60,10 +60,14 @@ enum PreviewRenderer {
     }
 
     private static func renderInWindow(_ view: some View, size: CGSize, to url: URL) {
+        // Ventana con titlebar real (como en la app): así el render refleja
+        // el safe area y la posición verdadera del contenido.
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
-                              styleMask: [.borderless],
+                              styleMask: [.titled, .closable, .fullSizeContentView],
                               backing: .buffered,
                               defer: false)
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
         window.appearance = NSAppearance(named: .darkAqua)
         window.backgroundColor = NSColor(calibratedWhite: 0.04, alpha: 1)
         let hosting = NSHostingView(rootView: view)

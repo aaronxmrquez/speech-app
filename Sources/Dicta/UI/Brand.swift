@@ -54,7 +54,7 @@ struct DotPatternView: View {
 
 /// Tile blanco redondeado con el logo (la cara) en negro, como en el branding.
 struct LogoTileView: View {
-    var size: CGFloat = 68
+    var size: CGFloat = 56
 
     var body: some View {
         ZStack {
@@ -349,5 +349,9 @@ struct BrandScreen<Content: View>: View {
         .frame(width: width, height: BrandWindow.height)
         .background(Theme.background)
         .preferredColorScheme(.dark)
+        // El titlebar mete un safe area de ~28pt que empuja todo hacia abajo:
+        // el diseño es full-bleed, así que lo ignoramos y el tag de versión
+        // queda a la altura real del botón de cerrar.
+        .ignoresSafeArea()
     }
 }
