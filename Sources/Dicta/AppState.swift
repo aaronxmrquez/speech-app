@@ -177,6 +177,11 @@ final class AppState: ObservableObject {
             engine.cancel()
             recorder.stop()
             showNotice(error.localizedDescription)
+            // Falta el modelo Whisper (instalación nueva): además del aviso,
+            // abrir Settings con el botón de descarga a un clic.
+            if (error as NSError).code == 4 {
+                (NSApp.delegate as? AppDelegate)?.showSettings()
+            }
             return
         }
 
