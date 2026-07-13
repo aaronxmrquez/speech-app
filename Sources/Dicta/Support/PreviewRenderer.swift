@@ -70,6 +70,7 @@ enum PreviewRenderer {
         window.titleVisibility = .hidden
         window.appearance = NSAppearance(named: .darkAqua)
         window.backgroundColor = NSColor(calibratedWhite: 0.04, alpha: 1)
+        BrandWindow.applyChrome(to: window)
         let hosting = NSHostingView(rootView: view)
         hosting.frame = NSRect(origin: .zero, size: size)
         window.contentView = hosting

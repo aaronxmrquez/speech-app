@@ -322,9 +322,15 @@ enum BrandWindow {
     static let height: CGFloat = 762
 
     /// Chrome de marca: solo el botón rojo de cerrar, como en el diseño.
+    /// Además fija el alto TOTAL de la ventana (incluida el área del titlebar
+    /// transparente) al alto del diseño: sin esto, fullSizeContentView agrega
+    /// ~28pt de titlebar que caían como banda vacía bajo el footer.
     static func applyChrome(to window: NSWindow) {
         window.standardWindowButton(.miniaturizeButton)?.isHidden = true
         window.standardWindowButton(.zoomButton)?.isHidden = true
+        var frame = window.frame
+        frame.size = NSSize(width: 560, height: height)
+        window.setFrame(frame, display: false)
     }
 }
 
