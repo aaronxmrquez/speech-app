@@ -268,7 +268,7 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(Theme.mono(10, .bold))
+                .font(Theme.sans(11, .semibold))
                 .tracking(0.5)
                 .foregroundStyle(enabled ? Color.black : Theme.tertiary)
                 .padding(.horizontal, 35)
@@ -318,8 +318,9 @@ struct BrandFooter: View {
 
 enum BrandWindow {
     static let backgroundColor = NSColor(srgbRed: 0.102, green: 0.102, blue: 0.110, alpha: 1)
-    /// Alto único de todas las ventanas (referencia: la pantalla de permisos).
-    static let height: CGFloat = 762
+    /// Alto único de todas las ventanas: el diseño (762) + holgura para que
+    /// permissions respire sin scroll.
+    static let height: CGFloat = 792
 
     /// Chrome de marca: solo el botón rojo de cerrar, como en el diseño.
     /// Además fija el alto TOTAL de la ventana (incluida el área del titlebar

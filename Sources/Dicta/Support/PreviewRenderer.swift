@@ -13,14 +13,14 @@ enum PreviewRenderer {
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
 
         render(SplashView(onBegin: {}),
-               size: CGSize(width: 560, height: 762),
+               size: CGSize(width: 560, height: 792),
                to: dir.appendingPathComponent("splash.png"))
 
         // Onboarding con permisos mixtos, para ver ambos estados de fila.
         // renderInWindow: ImageRenderer no dibuja el contenido de ScrollView.
         permissions.microphone = true
         renderInWindow(OnboardingView(permissions: permissions, onReady: {}),
-                       size: CGSize(width: 560, height: 762),
+                       size: CGSize(width: 560, height: 792),
                        to: dir.appendingPathComponent("onboarding.png"))
 
         // Estado "activo": todos los permisos concedidos.
@@ -29,7 +29,7 @@ enum PreviewRenderer {
         grantedPermissions.speechRecognition = true
         grantedPermissions.accessibility = true
         renderInWindow(OnboardingView(permissions: grantedPermissions, onReady: {}),
-                       size: CGSize(width: 560, height: 762),
+                       size: CGSize(width: 560, height: 792),
                        to: dir.appendingPathComponent("onboarding-active.png"))
 
         let state = AppState(prefs: prefs, permissions: permissions, history: HistoryStore.preview())
@@ -49,11 +49,11 @@ enum PreviewRenderer {
         // Ajustes usa controles AppKit (pickers, switches) que ImageRenderer no
         // sabe dibujar: renderizar la ventana real con cacheDisplay.
         renderInWindow(SettingsView(prefs: prefs),
-                       size: CGSize(width: 560, height: 762),
+                       size: CGSize(width: 560, height: 792),
                        to: dir.appendingPathComponent("settings.png"))
 
         renderInWindow(HistoryView(history: HistoryStore.preview()),
-                       size: CGSize(width: 560, height: 762),
+                       size: CGSize(width: 560, height: 792),
                        to: dir.appendingPathComponent("history.png"))
 
         return true
