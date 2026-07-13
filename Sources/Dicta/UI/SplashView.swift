@@ -26,10 +26,12 @@ final class SplashWindowController: NSObject, NSWindowDelegate {
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
             w.delegate = self
-            BrandWindow.applyChrome(to: w)
-            w.contentView = NSHostingView(rootView: SplashView { [weak self] in
+            let hosting = NSHostingView(rootView: SplashView { [weak self] in
                 self?.onBegin()
             })
+            hosting.sizingOptions = [] // que NUNCA redimensione la ventana
+            w.contentView = hosting
+            BrandWindow.applyChrome(to: w)
             w.center()
             window = w
         }
@@ -62,6 +64,10 @@ struct SplashView: View {
                                 .scaledToFit()
                                 .frame(width: 423)
                                 .opacity(0.78 + 0.22 * sin(time * 1.1))
+                                // el hueco del SVG está 14.5pt bajo su centro
+                                // geométrico (medido): se compensa para que el
+                                // logo quede exactamente en el vacío
+                                .offset(y: -14.5)
                         }
                     } else {
                         DotPatternView()

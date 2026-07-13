@@ -24,8 +24,10 @@ final class SettingsWindowController {
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
+            let hosting = NSHostingView(rootView: SettingsView(prefs: prefs))
+            hosting.sizingOptions = [] // que NUNCA redimensione la ventana
+            w.contentView = hosting
             BrandWindow.applyChrome(to: w)
-            w.contentView = NSHostingView(rootView: SettingsView(prefs: prefs))
             w.center()
             window = w
         }

@@ -28,10 +28,12 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
             w.delegate = self
-            BrandWindow.applyChrome(to: w)
-            w.contentView = NSHostingView(rootView: OnboardingView(permissions: permissions) { [weak self] in
+            let hosting = NSHostingView(rootView: OnboardingView(permissions: permissions) { [weak self] in
                 self?.finish()
             })
+            hosting.sizingOptions = [] // que NUNCA redimensione la ventana
+            w.contentView = hosting
+            BrandWindow.applyChrome(to: w)
             w.center()
             window = w
         }

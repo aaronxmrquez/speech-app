@@ -23,8 +23,10 @@ final class HistoryWindowController {
             w.appearance = NSAppearance(named: .darkAqua)
             w.isReleasedWhenClosed = false
             w.collectionBehavior = [.moveToActiveSpace]
+            let hosting = NSHostingView(rootView: HistoryView(history: history))
+            hosting.sizingOptions = [] // que NUNCA redimensione la ventana
+            w.contentView = hosting
             BrandWindow.applyChrome(to: w)
-            w.contentView = NSHostingView(rootView: HistoryView(history: history))
             w.center()
             window = w
         }
