@@ -58,8 +58,8 @@ struct HistoryView: View {
     private var historyBody: some View {
         VStack(spacing: 0) {
             BrandHeader(section: "HISTORY")
-                .padding(.top, 56)
-                .padding(.bottom, 8)
+                .padding(.top, 65)
+                .padding(.bottom, 30)
 
             if history.records.isEmpty {
                 Spacer()
@@ -106,8 +106,8 @@ struct HistoryView: View {
             }
 
             BrandFooter()
-                .padding(.top, 16)
-                .padding(.bottom, 16)
+                .padding(.top, 25)
+                .padding(.bottom, 30)
         }
     }
 

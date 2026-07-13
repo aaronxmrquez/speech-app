@@ -54,7 +54,7 @@ struct DotPatternView: View {
 
 /// Tile blanco redondeado con el logo (la cara) en negro, como en el branding.
 struct LogoTileView: View {
-    var size: CGFloat = 56
+    var size: CGFloat = 51
 
     var body: some View {
         ZStack {
@@ -79,14 +79,14 @@ struct BrandHeader: View {
     let section: String
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 15) {
             LogoTileView()
             (Text("DICTA.")
                 .foregroundColor(Theme.secondary)
              + Text(section)
                 .foregroundColor(Theme.primary))
-                .font(Theme.mono(24, .medium))
-                .tracking(1)
+                .font(Theme.mono(28, .regular))
+                .tracking(0.3)
         }
     }
 }
@@ -114,16 +114,20 @@ struct ChipButton: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(Theme.mono(12, .medium))
-                .tracking(1.5)
-                .foregroundStyle(selected ? Theme.primary : Theme.tertiary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 9)
+                .font(Theme.mono(15, .regular))
+                .tracking(0.15)
+                .foregroundStyle(Theme.primary)
+                .padding(.horizontal, 15)
+                .padding(.vertical, 13)
                 .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .strokeBorder(selected ? Color.white.opacity(0.6) : .clear, lineWidth: 1.2)
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(selected ? Color.white.opacity(0.09) : .clear)
                 )
-                .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(selected ? Color.white : .clear, lineWidth: 1)
+                )
+                .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plain)
     }
@@ -140,13 +144,13 @@ struct MenuChip<Option: Hashable>: View {
                 Button(option.label) { selection = option.value }
             }
         } label: {
-            HStack(spacing: 7) {
+            HStack(spacing: 8) {
                 Text(currentLabel)
-                    .font(Theme.mono(12, .medium))
-                    .tracking(1.5)
+                    .font(Theme.mono(15, .regular))
+                    .tracking(0.15)
                     .foregroundStyle(Theme.primary)
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Theme.tertiary)
             }
         }
@@ -155,11 +159,15 @@ struct MenuChip<Option: Hashable>: View {
         .fixedSize()
         // Padding FUERA del Menu (si va en el label, Menu lo trunca) pero
         // dentro del borde: mismas métricas que ChipButton.
-        .padding(.horizontal, 14)
-        .padding(.vertical, 9)
+        .padding(.horizontal, 15)
+        .padding(.vertical, 13)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.white.opacity(0.09))
+        )
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.6), lineWidth: 1.2)
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(Color.white, lineWidth: 1)
         )
     }
 
@@ -180,10 +188,10 @@ struct BrandToggle: View {
                 Capsule()
                     .fill(Color.white.opacity(0.08))
                     .overlay(Capsule().strokeBorder(Theme.cardBorder, lineWidth: 1))
-                    .frame(width: 46, height: 26)
+                    .frame(width: 64, height: 36)
                 Circle()
-                    .fill(isOn ? Theme.accent : Color.white.opacity(0.28))
-                    .frame(width: 20, height: 20)
+                    .fill(isOn ? Theme.accent : Color.white.opacity(0.16))
+                    .frame(width: 30, height: 30)
                     .padding(3)
             }
         }
@@ -197,9 +205,10 @@ struct SectionLabel: View {
 
     var body: some View {
         Text(text)
-            .font(Theme.mono(12, .medium))
-            .tracking(2.5)
-            .foregroundStyle(Theme.tertiary)
+            .font(Theme.mono(15, .regular))
+            .tracking(0.15)
+            .foregroundStyle(Theme.secondary)
+            .padding(.leading, 10)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -211,11 +220,11 @@ struct BrandCard<Content: View>: View {
     var body: some View {
         VStack(spacing: 0) { content() }
             .background(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                RoundedRectangle(cornerRadius: 38, style: .continuous)
                     .fill(Theme.card)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                RoundedRectangle(cornerRadius: 38, style: .continuous)
                     .strokeBorder(Theme.cardBorder, lineWidth: 1)
             )
     }
@@ -233,7 +242,7 @@ struct BrandDivider: View {
 /// Círculo de estado de permiso: verde al concederse.
 struct StatusCircle: View {
     let granted: Bool
-    var size: CGFloat = 34
+    var size: CGFloat = 30
 
     var body: some View {
         ZStack {
@@ -259,18 +268,18 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(Theme.mono(13, .semibold))
-                .tracking(2.5)
+                .font(Theme.mono(10, .bold))
+                .tracking(0.5)
                 .foregroundStyle(enabled ? Color.black : Theme.tertiary)
-                .padding(.horizontal, 30)
+                .padding(.horizontal, 35)
                 .frame(maxWidth: fullWidth ? .infinity : nil)
-                .frame(height: 48)
+                .frame(height: 53)
                 .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: 15, style: .continuous)
                         .fill(enabled ? Color.white : Color.clear)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: 15, style: .continuous)
                         .strokeBorder(enabled ? Color.clear : Color.white.opacity(0.14), lineWidth: 1)
                 )
         }
@@ -284,7 +293,7 @@ struct PrimaryButton: View {
 /// aaronxmarquez.com — mismo color que el resto del texto, solo subrayado.
 struct BrandFooter: View {
     var body: some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 2) {
             Text("Just speak and the text will be written wherever your cursor is.")
             HStack(spacing: 4) {
                 Text("An app created by")
@@ -300,7 +309,7 @@ struct BrandFooter: View {
                     }
             }
         }
-        .font(Theme.sans(11))
+        .font(Theme.sans(11.5))
         .foregroundStyle(Theme.tertiary)
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
@@ -330,8 +339,8 @@ struct BrandScreen<Content: View>: View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 0) {
                 BrandHeader(section: section)
-                    .padding(.top, 56)
-                    .padding(.bottom, 8)
+                    .padding(.top, 65)
+                    .padding(.bottom, 30)
                 ScrollView(showsIndicators: false) {
                     content()
                 }
@@ -339,8 +348,8 @@ struct BrandScreen<Content: View>: View {
                 // si no cabe, el usuario puede scrollear.
                 .scrollBounceBehavior(.basedOnSize, axes: .vertical)
                 BrandFooter()
-                    .padding(.top, 16)
-                    .padding(.bottom, 16)
+                    .padding(.top, 25)
+                    .padding(.bottom, 30)
             }
             VersionTag()
                 .padding(.top, 14)

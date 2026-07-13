@@ -46,7 +46,7 @@ struct SettingsView: View {
 
     var body: some View {
         BrandScreen(section: "SETTINGS") {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 15) {
                 section("ACTIVATION") {
                     row("MODE") {
                         HStack(spacing: 4) {
@@ -122,8 +122,7 @@ struct SettingsView: View {
                 }
             }
             .padding(.horizontal, 30)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+            .padding(.bottom, 20)
         }
     }
 
@@ -172,7 +171,7 @@ struct SettingsView: View {
 
     @ViewBuilder
     private func section(_ title: String, @ViewBuilder content: @escaping () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 5) {
             SectionLabel(text: title)
             BrandCard { content() }
         }
@@ -181,13 +180,13 @@ struct SettingsView: View {
     private func row(_ label: String, @ViewBuilder control: () -> some View) -> some View {
         HStack {
             Text(label)
-                .font(Theme.mono(13, .medium))
-                .tracking(2)
+                .font(Theme.mono(15, .regular))
+                .tracking(0.15)
                 .foregroundStyle(Theme.primary)
             Spacer()
             control()
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 30)
+        .padding(.vertical, 15)
     }
 }

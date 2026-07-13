@@ -53,7 +53,7 @@ struct SplashView: View {
                 // Halo de puntos animado con el logo al centro.
                 ZStack {
                     DotPatternView()
-                        .frame(width: 460, height: 230)
+                        .frame(width: 423, height: 158)
                     LogoTileView()
                 }
 
@@ -66,21 +66,21 @@ struct SplashView: View {
                     Text("USE DICTA.")
                         .foregroundStyle(Theme.primary)
                 }
-                .font(Theme.mono(26, .medium))
-                .tracking(2)
+                .font(Theme.mono(30, .regular))
+                .tracking(0.3)
                 .multilineTextAlignment(.center)
-                .padding(.top, 18)
+                .padding(.top, 35)
 
                 Text("Just speak and the text will be written\nwherever your cursor is.")
-                    .font(Theme.sans(13))
+                    .font(Theme.sans(15))
                     .foregroundStyle(Theme.secondary)
                     .multilineTextAlignment(.center)
-                    .lineSpacing(3)
-                    .padding(.top, 22)
+                    .lineSpacing(4)
+                    .padding(.top, 20)
 
                 PrimaryButton(label: "LET'S BEGIN", enabled: true, fullWidth: true, action: onBegin)
-                    .padding(.horizontal, 60)
-                    .padding(.top, 36)
+                    .frame(width: 348)
+                    .padding(.top, 20)
 
                 Spacer(minLength: 40)
 
@@ -97,9 +97,9 @@ struct SplashView: View {
                             }
                         }
                 }
-                .font(Theme.sans(11))
+                .font(Theme.sans(11.5))
                 .foregroundStyle(Theme.tertiary)
-                .padding(.bottom, 16)
+                .padding(.bottom, 30)
             }
             .frame(maxWidth: .infinity)
 

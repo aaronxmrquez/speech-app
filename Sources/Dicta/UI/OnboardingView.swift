@@ -65,7 +65,7 @@ struct OnboardingView: View {
 
     var body: some View {
         BrandScreen(section: "PERMISSIONS") {
-            VStack(spacing: 14) {
+            VStack(spacing: 8) {
                 PermissionCard(
                     icon: "mic",
                     title: "MICROPHONE",
@@ -93,7 +93,6 @@ struct OnboardingView: View {
                 }
             }
             .padding(.horizontal, 30)
-            .padding(.top, 24)
 
             // El statement se mudó al splash: aquí va el botón de cierre
             // del set up, con el ancho fijo del diseño.
@@ -101,9 +100,9 @@ struct OnboardingView: View {
                           enabled: permissions.allGranted,
                           fullWidth: true,
                           action: onReady)
-                .frame(width: 458)
+                .frame(width: 290)
                 .frame(maxWidth: .infinity)
-                .padding(.top, 48)
+                .padding(.top, 46)
         }
     }
 }
@@ -119,24 +118,24 @@ struct PermissionCard: View {
         Button {
             if !granted { action() }
         } label: {
-            HStack(spacing: 16) {
+            HStack(spacing: 33) {
                 ZStack {
                     Circle()
                         .fill(Color.white.opacity(0.04))
                         .overlay(Circle().strokeBorder(Theme.cardBorder, lineWidth: 1))
-                        .frame(width: 46, height: 46)
+                        .frame(width: 38, height: 38)
                     Image(systemName: icon)
-                        .font(.system(size: 17, weight: .light))
+                        .font(.system(size: 19, weight: .light))
                         .foregroundStyle(Theme.secondary)
                 }
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(title)
-                        .font(Theme.mono(15, .medium))
-                        .tracking(2.5)
+                        .font(Theme.mono(15, .regular))
+                        .tracking(0.15)
                         .foregroundStyle(Theme.primary)
                     Text(detail)
-                        .font(Theme.sans(12.5))
+                        .font(Theme.sans(11.5))
                         .foregroundStyle(Theme.secondary)
                 }
 
@@ -144,16 +143,17 @@ struct PermissionCard: View {
 
                 StatusCircle(granted: granted)
             }
-            .padding(22)
-            .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .padding(.horizontal, 30)
+            .frame(height: 121)
+            .contentShape(RoundedRectangle(cornerRadius: 38, style: .continuous))
         }
         .buttonStyle(.plain)
         .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 38, style: .continuous)
                 .fill(Theme.card)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 38, style: .continuous)
                 .strokeBorder(Theme.cardBorder, lineWidth: 1)
         )
     }
